@@ -1,0 +1,35 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "diting"
+version = "0.7.0"
+description = "A Pipeline to Infer and Compare Biogeochemical Pathways From Metagenomic and Metatranscriptomic Data"
+readme = "README.md"
+authors = [
+    { name = "Xue Chunxu", email = "xuechunxu@outlook.com" },
+    { name = "Heyu Lin", email = "heyu.lin@student.unimelb.edu.au" }
+]
+requires-python = ">=3.9"
+dependencies = [
+    "snakemake>=9.0",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "Pillow",
+    "opencv-python"
+]
+
+[project.scripts]
+diting = "diting.cli:main"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "diting",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "diting",
+]

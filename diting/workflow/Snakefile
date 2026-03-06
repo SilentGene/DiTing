@@ -1,0 +1,49 @@
+import os
+import sys
+
+# Make `scripts` module available
+sys.path.insert(0, workflow.basedir)
+
+from scripts.check import check_reads
+
+# Parse CLI configuration
+vis_file = config.get("vis", False)
+reads_dir = config.get("reads_dir")
+out_dir = config.get("out_dir", "diting.out")
+assembly_dir = config.get("assembly_dir", False)
+use_spades = str(config.get("spades", "False")).lower() == "true"
+memory = config.get("memory", 50)
+threads_cli = config.get("threads", 4)
+noclean = str(config.get("noclean", "False")).lower() == "true"
+
+KODB_DIR = os.path.join(os.getcwd(), 'kofam_database')
+DMSP_DIR = os.path.join(workflow.basedir, 'DMSP_database')
+TABLE_DIR = os.path.join(workflow.basedir, 'table')
+PATHWAY_ACCESSORY = os.path.join(workflow.basedir, 'scripts', 'accessory-scripts')
+
+# If running the full pipeline (not just vis)
+if not vis_file:
+    BASENAMES, READS_SUF, READS_INTER = check_reads(reads_dir)
+else:
+    BASENAMES = []
+    READS_SUF = ''
+    READS_INTER = False
+    
+rule all:
+    input:
+        vis=expand("{out_dir}/Figure/{cycle}_{type}.png", 
+                   out_dir=[out_dir] if not vis_file else [os.path.dirname(vis_file) or "."], 
+                   cycle=["carbon_cycle", "nitrogen_cycle", "DMSP_cycle", "sulfur_cycle"], 
+                   type=["sketch"]) 
+        if vis_file or BASENAMES else [],
+        tables=[os.path.join(out_dir, "pathways_relative_abundance.tab"), 
+                os.path.join(out_dir, "ko_abundance_among_samples.tab")] 
+        if not vis_file else []
+
+# Include rule files
+include: "rules/setup_db.smk"
+include: "rules/assembly.smk"
+include: "rules/mapping.smk"
+include: "rules/annotation.smk"
+include: "rules/aggregation.smk"
+include: "rules/visualization.smk"

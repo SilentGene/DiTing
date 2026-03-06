@@ -1,0 +1,21 @@
+name: diting-env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python>=3.9
+  - snakemake>=9.0
+  - pandas
+  - matplotlib
+  - seaborn
+  - megahit
+  - spades
+  - prodigal
+  - bwa
+  - bbmap
+  - hmmer
+  - kofamscan
+  - pip
+  - pip:
+    - -e .

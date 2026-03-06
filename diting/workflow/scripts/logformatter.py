@@ -1,5 +1,4 @@
 import logging
-from scripts.variables import *
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
