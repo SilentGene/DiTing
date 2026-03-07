@@ -23,6 +23,7 @@ dependencies = [
 
 [project.scripts]
 diting = "diting.cli:main"
+diting-download-db = "diting.download_db:main"
 
 [tool.hatch.build.targets.sdist]
 include = [

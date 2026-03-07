@@ -1,7 +1,7 @@
 rule kegg_annotation:
     input:
         faa = os.path.join(out_dir, "ORFs", "{sample}.faa"),
-        ko_list = os.path.join(KODB_DIR, "ko_list")
+        ko_list = KO_LIST
     output:
         raw = temp(os.path.join(out_dir, "KEGG_annotation", "hmmout", "{sample}-ko-annotations.tsv")),
         filtered = os.path.join(out_dir, "KEGG_annotation", "hmmout", "{sample}-ko-annotations-filtered.tsv")
@@ -10,7 +10,7 @@ rule kegg_annotation:
         hmmout_dir = os.path.join(out_dir, "KEGG_annotation", "hmmout")
         os.makedirs(hmmout_dir, exist_ok=True)
         tmp_dir = os.path.join(hmmout_dir, f"{wildcards.sample}-ko-tmp")
-        profiles_dir = os.path.join(KODB_DIR, "profiles")
+        profiles_dir = KODB_DIR
         
         shell(f"exec_annotation -p {profiles_dir} -k {input.ko_list} --cpu {threads} -f detail-tsv --e-value 1e-5 --tmp-dir {tmp_dir} -o {output.raw} {input.faa}")
         

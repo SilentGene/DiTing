@@ -1,16 +1,16 @@
 rule setup_db:
     output:
-        ko_list = os.path.join(KODB_DIR, "ko_list"),
-        ko_profile = os.path.join(KODB_DIR, "profiles", "K00001.hmm"),
-        dmsp_profile = os.path.join(KODB_DIR, "profiles", "AcuH.hmm")
+        ko_list = KO_LIST,
+        # We don't strictly "produce" these in the rule anymore as they must exist,
+        # but we can use them as triggers or just keep the rule for DMSP parsing.
+        ko_profile_sample = os.path.join(KODB_DIR, "K00001.hmm"),
+        dmsp_profile = os.path.join(KODB_DIR, "AcuH.hmm")
     run:
         from scripts.check import check_kodb, check_DMSP_db
-        from scripts.func import download_db, DMSP_db_parse
+        from scripts.func import DMSP_db_parse
         
-        if not check_kodb(KODB_DIR):
-            print("Downloading KEGG database...")
-            download_db(KODB_DIR)
-        
+        # We assume kofam database exists because the CLI validated it.
+        # But we still need to parse DMSP if it's not already in the profiles dir.
         if not check_DMSP_db(KODB_DIR):
             print("Parsing DMSP database...")
-            DMSP_db_parse(DMSP_DIR, KODB_DIR)
+            DMSP_db_parse(DMSP_DIR, KODB_DIR, KO_LIST)

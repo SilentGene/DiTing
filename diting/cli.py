@@ -12,6 +12,8 @@ def main():
     parser.add_argument('-n', '--threads', metavar='threads', dest='n', type=int, default=4, help='threads that will be used')
     parser.add_argument('--noclean', dest='nc', action='store_true', default=False, help='The sam files would be retained if this flag is used')
     parser.add_argument('-vis', '--visualization', metavar='pathways_relative_abundance.tab', dest='vis', type=str, default=False, help='A table for visualization')
+    parser.add_argument('-p', '--profiles', metavar='profiles_dir', dest='p', type=str, required=False, help='folder containing kofam profiles (*.hmm)')
+    parser.add_argument('-k', '--ko-list', metavar='ko_list', dest='k', type=str, required=False, help='ko_list file')
     parser.add_argument('--spades', dest='spades', action='store_true', default=False, help='metaSPAdes will be used for assembling instead of megahit if this flag is used')
     parser.add_argument('-m', '--memory', metavar='memory', dest='m', type=int, default=50, help='Memory that will be used by metaSPAdes (in Gb). Default=50G')
     parser.add_argument('--dry-run', action='store_true', help='Perform a dry run of the snakemake pipeline')
@@ -41,10 +43,34 @@ def main():
         if not args.o:
             print("Error: The following arguments are required: -o/--outdir", file=sys.stderr)
             sys.exit(1)
+        if not args.p:
+            print("Error: The following arguments are required: -p/--profiles", file=sys.stderr)
+            sys.exit(1)
+        if not args.k:
+            print("Error: The following arguments are required: -k/--ko-list", file=sys.stderr)
+            sys.exit(1)
             
+        # Validate database
+        profiles_dir = Path(args.p).resolve()
+        ko_list = Path(args.k).resolve()
+        
+        if not profiles_dir.is_dir():
+            print(f"Error: Profiles directory {profiles_dir} does not exist or is not a directory", file=sys.stderr)
+            sys.exit(1)
+            
+        if not any(profiles_dir.glob("*.hmm")):
+            print(f"Error: Profiles directory {profiles_dir} must contain at least one *.hmm file", file=sys.stderr)
+            sys.exit(1)
+            
+        if not ko_list.is_file():
+            print(f"Error: ko_list file {ko_list} does not exist", file=sys.stderr)
+            sys.exit(1)
+
         config_args.extend([
             f"reads_dir={os.path.abspath(args.r)}",
             f"out_dir={os.path.abspath(args.o)}",
+            f"profiles_dir={str(profiles_dir)}",
+            f"ko_list={str(ko_list)}",
             f"spades={args.spades}",
             f"memory={args.m}",
             f"threads={args.n}",

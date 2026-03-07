@@ -16,7 +16,10 @@ memory = config.get("memory", 50)
 threads_cli = config.get("threads", 4)
 noclean = str(config.get("noclean", "False")).lower() == "true"
 
-KODB_DIR = os.path.join(os.getcwd(), 'kofam_database')
+KODB_DIR = config.get("profiles_dir") # This is now the profiles dir
+KO_LIST = config.get("ko_list")
+# For compatibility with existing rules that might expect a parent dir, 
+# though we are refactoring them to use these explicit paths.
 DMSP_DIR = os.path.join(workflow.basedir, 'DMSP_database')
 TABLE_DIR = os.path.join(workflow.basedir, 'table')
 PATHWAY_ACCESSORY = os.path.join(workflow.basedir, 'scripts', 'accessory-scripts')

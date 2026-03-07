@@ -45,26 +45,19 @@ def download_db(ko_db):
 
     logging.info('Database has been downloaded and deployed successfully at {}'. format(ko_db))
 
-def DMSP_db_parse(DMSP_DIR, KODB_DIR):
+def DMSP_db_parse(DMSP_DIR, KODB_DIR, KO_LIST):
     logging.info('DMSP database parsing')
-    DMSP_hmm_db = DMSP_DIR + '/profiles/*.hmm'
+    # Use glob to handle multiple HMM files
+    import glob
+    DMSP_hmm_files = glob.glob(os.path.join(DMSP_DIR, 'profiles', '*.hmm'))
     DMSP_related_gene_list = os.path.join(DMSP_DIR, 'DMSP_related_gene.list')
-    ko_db_profiles_dir = os.path.join(KODB_DIR, 'profiles')
-    ko_list = KODB_DIR + '/ko_list'
-    cmd_para_cp = ['cp',
-                DMSP_hmm_db,
-                ko_db_profiles_dir
-                ]
-    cmd = ' '.join(cmd_para_cp)
-    os.system(cmd)
+    
+    for hmm_file in DMSP_hmm_files:
+        shutil.copy(hmm_file, KODB_DIR)
 
-    cmd_para_cat = ['cat',
-                    DMSP_related_gene_list,
-                    '>>',
-                    ko_list
-                    ]
-    cmd = ' '.join(cmd_para_cat)
-    os.system(cmd)
+    with open(DMSP_related_gene_list, 'r') as f_in, open(KO_LIST, 'a') as f_out:
+        f_out.write(f_in.read())
+        
     logging.info("Database parsing done")
 
 

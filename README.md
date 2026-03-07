@@ -16,22 +16,17 @@ DiTing is designed to determine the relative abundance of metabolic and biogeoch
 ![image](./Flow_chart.png)
 
 ## Dependencies
+DiTing now relies on **Snakemake >= 9.0** to orchestrate the pipeline and uses `hatchling` to package the modules. The underlying bioinformatics dependencies remain:
 * [Megahit](https://github.com/voutcn/megahit)
 * [SPAdes](https://cab.spbu.ru/software/spades/)
 * [Prodigal](https://github.com/hyattpd/Prodigal)
 * [bwa](https://github.com/lh3/bwa)
 * [BBMap](https://github.com/BioInfoTools/BBMap)
 * [HMMER3](http://hmmer.org/)
-* [python3](https://www.python.org/downloads/)
-* Python modules: 
-    * [Pandas](http://pandas.pydata.org/pandas-docs/stable/install.html)
-    * [matplotlib](http://matplotlib.org/users/installing.html)
-    * [opencv](https://pypi.org/project/opencv-python/)
-    * [Pillow](https://pypi.org/project/Pillow/)
-    * [seaborn](https://seaborn.pydata.org/index.html)
+* [KofamScan](https://github.com/takaram/kofam_scan)
+* Python modules (handled strictly by conda/pip): 
+    * `pandas`, `matplotlib`, `opencv-python`, `Pillow`, `seaborn`
 * KofamKOALA hmm database (ftp://ftp.genome.jp/pub/db/kofam/)
-    * ko_list.gz (ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz)
-    * profiles.tar.gz (ftp://ftp.genome.jp/pub/db/kofam/profiles.tar.gz)
 
 ## Installation
 Recommended configuration:  
@@ -39,54 +34,50 @@ Recommended configuration:
 CPU threads ≥ 8  
 RAM ≥ 64 Gb
 ```
-### Option 1: Conda (recommended)
-Configure conda environment
+
+### Option 1: Conda Environment Setup (Recommended)
+You can build the completely reproducible stack straight from the `environment.yaml`:
+
 ```bash
-# order matters
-conda config --add channels defaults
-conda config --add channels conda-forge
-conda config --add channels bioconda
-conda config --add channels silentgene
-```
-Set up a `Diting` environments
-```bash
-conda create -n diting-env 
-```
-Activate `diting-env` and install `DiTing` program
-```bash
+# 1. Download the repo
+git clone https://github.com/xuechunxu/DiTing.git
+cd DiTing
+
+# 2. Build the exact environment mapping resolving all snakemake dependencies
+conda env create -f environment.yaml
+
+# 3. Activate the environment
 conda activate diting-env
-conda install -c silentgene diting
 ```
-Deactivate diting-env
-```bash
-conda deactivate
-```
-### Option 2: Repository from GitHub
-#### Step 1. Download main scripts
-`git clone https://github.com/xuechunxu/DiTing.git`
-or click the green button `Clone or download` and select `download ZIP` to download the repo  and unzip manually.
+Once inside the environment, the `diting` CLI command will be available natively as an entry point. 
 
-#### Step 2. Download databases
-DiTing requires [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala/). This database will be downloaded and unzipped automatically on the first run. 
-You can also download the database manually. This database should be stored in the same directory with the `diting.py` scripts. 
+### Option 2: Build from Source
+If setting up via pure pip, you need to ensure the `Dependencies` outlined above are already correctly placed onto your system PATH, then:
+```bash
+git clone https://github.com/xuechunxu/DiTing.git
+cd DiTing
+pip install -e .
+```
+
+#### Database Downloads
+DiTing requires [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala/). You can download and extract the database using the following command:
 
 ```bash
-# At the home directory of this program
-mkdir kofam_database
-cd kofam_database
-wget -c ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz 
-wget -c ftp://ftp.genome.jp/pub/db/kofam/profiles.tar.gz 
-gzip -d ko_list.gz
-tar zxvf profiles.tar.gz 
+diting-download-db -o <kofam_database>
 ```
-####  Step 3. Install the Dependencies
-The [Dependencies](#Dependencies) are required to be installed and added to the system `$PATH`
+This will download `ko_list` and the profile HMMs into the specified directory.
 
 ## Running
 ### 1. One step running
+Instead of invoking `python diting.py`, the CLI automatically handles forming connections into the `Snakemake` pipeline.
+
 ```bash
-diting.py -r <clean_reads_dir> -o <output_dir>  
-diting.py -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir>
+# 1. Download database
+diting-download-db -o kofam_database
+
+# 2. Run dieting
+diting -r <clean_reads_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
+diting -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 ```
 Example reads run:  
 ```bash
@@ -96,24 +87,20 @@ URL: https://drive.google.com/file/d/132605rtKuA-Xx--eh3aC7i5WIExNWl5k/view?usp=
 after download, run:
 unzip Clean-reads_interleaved.zip
 
-OR If you are in China, you can download from Baiduyun:  
-URL: https://pan.baidu.com/s/1gFtJnz1G3pdEqBSFnUqFJw  
-Password: diti
-
 # run Example
-diting.py -r Clean-reads_interleaved -o Clean-reads_interleaved.diting.out
+diting -r Clean-reads_interleaved -o Clean-reads_interleaved.diting.out -p kofam_database/profiles -k kofam_database/ko_list
 ```
 The input is the `<clean_reads_dir>` folder containing a group of paired-end metagenomic clean reads, looks like: 
 ```
 sample_one_1.fastq
 sample_one_2.fastq
-sample_two_1.fastq
-sample_two_2.fastq
+...
 sample_three_1.fastq
 sample_three_2.fastq
 ```
 The paired-end metagenomic clean reads should end with `.fq`, `.fq.gz`, `.fastq`, or `.fastq.gz`.
 The interleaved reads are also supported.
+
 ### 2. Optional parameter
 #### 2.1 --spades
 Using `metaSPAdes` instead of `megahit` to assemble reads
@@ -126,7 +113,7 @@ Consider setting memory limitation by `-m` when usign `SPAdes` as assembler
 Path to a folder containing metagenomic assemblies corresponding to the provided reads, which is expected to have the same base name as the reads. The reads will not be assembled when this parameter was used.
 
 ```bash
-python diting.py -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir>
+diting -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir> -p <profiles_dir> -k <ko_list>
 ```
 The `<metagenomic_assembly>` folder looks like: 
 ```
@@ -134,32 +121,28 @@ sample_one.fa
 sample_two.fa
 sample_three.fa
 ```
-#### 2.3 Using interleaved paired-end reads
-DiTing supports interleaved paired-end fastq files. Note that the reads type must be all interleaved or all separated. 
-```bash
-e.g. [clean_reads_dir] content:
-samples1.fq.gz
-samples2.fq.gz
-samples3.fq.gz
-samples4.fq.gz
-
-```
 
 #### 2.4 -n (--threads) number of threads
 Number of threads to run (default: 4)
 
 ```bash
-diting.py -r <clean_reads_Dir> -a <metagenomic_assembly> -o <output_dir> -n 20
+diting -r <clean_reads_Dir> -a <metagenomic_assembly> -o <output_dir> -n 20 -p <profiles_dir> -k <ko_list>
 ```
 #### 2.5 --noclean
-The sam files would be retained if this flag was used. 
+The intermediate `.sam` files would be retained if this flag was used. 
 ```bash
-diting.py -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir> -n 12 --noclean
+diting -r <clean_reads_dir> -o <output_dir> -n 12 --noclean -p <profiles_dir> -k <ko_list>
 ```
 #### 2.6 -vis (--visualization) pathways_relative_abundance.tab
 Visualization can also be executed independently, which allows users to adjust the final result table (e.g., merge some similar samples) before the visualization.
 ```bash
-diting.py -vis <pathways_relative_abundance.tab>
+diting -vis <pathways_relative_abundance.tab>
+```
+
+#### 2.7 --dry-run
+Perform a dry run of the snakemake DAG pipeline to view exactly which sequence tasks execute.
+```bash
+diting -r <clean_reads_dir> -o <output_dir> --dry-run -p <profiles_dir> -k <ko_list>
 ```
 ### 3. Output
 #### 3.1 Table

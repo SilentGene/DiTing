@@ -1,4 +1,4 @@
-name: diting-env
+name: diting
 channels:
   - conda-forge
   - bioconda

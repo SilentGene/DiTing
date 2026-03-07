@@ -7,21 +7,23 @@ from scripts.logformatter import *
 
 
 def check_kodb(ko_db):
-    ko_list_path = os.path.join(ko_db, 'ko_list')
-    profiles_path = os.path.join(ko_db, 'profiles')
-    hmm_path = os.path.join(profiles_path, 'K00001.hmm')
-    db_files = [ko_db, ko_list_path, profiles_path, hmm_path]
-    for fl in db_files:
-        if not os.path.exists(fl):
-            return False
-        #if os.path.exists(fl):
-            #return True
+    """
+    Check if the kofam database is valid.
+    ko_db is now the directory containing .hmm files.
+    """
+    if not os.path.isdir(ko_db):
+        return False
+    # Check if there is at least one .hmm file
+    import glob
+    if not glob.glob(os.path.join(ko_db, "*.hmm")):
+        return False
+    return True
 
 def check_DMSP_db(ko_db):
-    profiles_path = os.path.join(ko_db, 'profiles')
-    hmm_path = os.path.join(profiles_path, 'AcuH.hmm')
+    hmm_path = os.path.join(ko_db, 'AcuH.hmm')
     if not os.path.exists(hmm_path):
         return False
+    return True
 
 
 def check_reads_assembly(assembly_dir, basenames):
