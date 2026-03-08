@@ -1,16 +1,20 @@
 <img src="./DiTing_logo.jpg" width="250" height="250">
 
 # DiTing
+![Version](https://img.shields.io/badge/version-v2.0.1-blue)
+![Python](https://img.shields.io/badge/python-%E2%89%A53.9-blue)
+![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A59.0-brightgreen)
+
 ## Etymology
-**DiTing** is a Chinese mythical creature who knows everything when he puts ears on the earth's surface. Parallelly, this program is developed to recognize biogeochemical cycles from environmental omic data accurately and efficiently.    
-**谛听(DiTing)** 若伏在地下，一霎时，便可将四大部洲山川社稷、洞天福地之间， 蠃虫、鳞虫、毛虫、羽虫、昆虫，天仙、地仙、神仙、人仙、鬼仙，顾鉴善恶，察听贤愚。
+**DiTing** is a Chinese mythical creature who knows everything when he puts his ears to the earth's surface. Similarly, this program is developed to accurately and efficiently recognize biogeochemical cycles from environmental omic data.    
+**谛听 (DiTing)** 若伏在地下，一霎时，便可将四大部洲山川社稷、洞天福地之间，蠃虫、鳞虫、毛虫、羽虫、昆虫，天仙、地仙、神仙、人仙、鬼仙，顾鉴善恶，察听贤愚。
 
 ## Citation
 To cite DiTing please use  
 > Xue CX, Lin H, Zhu XY, Liu J, Zhang Y, Rowley G, Todd JD, Li M, Zhang XH. DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways From Metagenomic and Metatranscriptomic Data. Front Microbiol. 2021 Aug 2;12:698286. doi: 10.3389/fmicb.2021.698286.    
 
 ## Introduction
-DiTing is designed to determine the relative abundance of metabolic and biogeochemical functional pathways in a set of given metagenomic/metatranscriptomic data. The input is expected to be a folder containing a group of paired-end clean reads. These reads will be assembled, annotated, and parsed for producing a table of relative abundance of elemental/biogeochemical cycling pathways (e.g., Nitrogen, Carbon, Sulfur, and DMSP) in each sample. Sketch maps and heatmaps will also be produced accordingly for comparing biogeochemical functions visually.
+DiTing is designed to determine the relative abundance of metabolic and biogeochemical functional pathways in a set of given metagenomic or metatranscriptomic data. The input should be a folder containing a group of paired-end clean reads. These reads will be assembled, annotated, and parsed to produce a table detailing the relative abundance of elemental and biogeochemical cycling pathways (e.g., Nitrogen, Carbon, Sulfur, and DMSP) in each sample. Sketch maps and heatmaps will also be produced to visually compare these biogeochemical functions.
 
 ## Procedure
 ![image](./Flow_chart.png)
@@ -55,7 +59,7 @@ DiTing requires [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala
 ```bash
 diting-download-db -o <kofam_database>
 ```
-This will download `ko_list` and the profile HMMs folder `profiles` into the specified directory. Otherwise, you can download the database manually and extract it into the specified directory.
+This will download `ko_list` and the profile HMMs folder `profiles` into the specified directory. Alternatively, you can download the database manually and extract it into the specified directory.
 
 ```bash
 mkdir kofam_database
@@ -87,7 +91,7 @@ unzip Clean-reads_interleaved.zip
 # run Example
 diting -r Clean-reads_interleaved -o Clean-reads_interleaved.diting.out -p kofam_database/profiles -k kofam_database/ko_list
 ```
-The input is the `<clean_reads_dir>` folder containing a group of paired-end metagenomic clean reads, looking like: 
+The input is the `<clean_reads_dir>` folder containing a group of paired-end metagenomic clean reads, formatted as follows:
 ```
 sample_one_1.fastq
 sample_one_2.fastq
@@ -96,7 +100,7 @@ sample_three_1.fastq
 sample_three_2.fastq
 ```
 The paired-end metagenomic clean reads should end with `.fq`, `.fq.gz`, `.fastq`, or `.fastq.gz`.
-The interleaved reads are also supported, looking like:
+Interleaved reads are also supported and should be formatted as follows:
 ```
 sample_one.fq.gz
 sample_two.fq.gz
@@ -112,7 +116,7 @@ Consider setting memory limitation by `-m` when usign `SPAdes` as assembler
 `-m(--memory) <int>` default: 50 (in Gb)
 
 #### 2.2 -a (--assembly) metagenomic assembly
-Path to a folder containing metagenomic assemblies corresponding to the provided reads, which is expected to have the same base name as the reads. The reads will not be assembled when this parameter was used.
+Path to a folder containing metagenomic assemblies corresponding to the provided reads, which is expected to have the same base names as the reads. The reads will not be assembled when this parameter is used.
 
 ```bash
 diting -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir> -p <profiles_dir> -k <ko_list>
@@ -131,7 +135,7 @@ Number of threads to run (default: 4)
 diting -r <clean_reads_Dir> -a <metagenomic_assembly> -o <output_dir> -n 20 -p <profiles_dir> -k <ko_list>
 ```
 #### 2.5 --noclean
-The intermediate `.sam` files would be retained if this flag was used. 
+The intermediate `.sam` files will be retained if this flag is used.
 ```bash
 diting -r <clean_reads_dir> -o <output_dir> -n 12 --noclean -p <profiles_dir> -k <ko_list>
 ```
@@ -148,8 +152,8 @@ diting -r <clean_reads_dir> -o <output_dir> --dry-run -p <profiles_dir> -k <ko_l
 ```
 ### 3. Output
 #### 3.1 Table
-- `pathways_relative_abundance.tab` :The final result with the relative abundance of pathways in each sample. 
-- `ko_abundance_among_samples.tab` : A table with the relative abundance of each `k_number` of KEGG annotation is produced in `KEGG_annotation` folder. 
+- `pathways_relative_abundance.tab`: The final result containing the relative abundance of pathways in each sample. 
+- `ko_abundance_among_samples.tab`: A table containing the relative abundance of each KEGG annotation `k_number`, produced inside the `KEGG_annotation` folder. 
 
 #### 3.2 Visualization
 - `carbon_cycle_sketch.png`, `nitrogen_cycle_sketch.png`, `DMSP_cycle_sketch.png` and `sulfur_cycle_sketch.png`
@@ -158,10 +162,10 @@ Sketch maps regarding carbon, nitrogen and sulfur cycles
 Heatmaps regarding carbon, nitrogen, sulfur cycles and other pathways
 
 Example:
-`sketch`look like:
+`sketch` looks like:
 <img src="./example/diting.out/sketch.png" width="792" height="624">
 
-`heatmap`look like:
+`heatmap` looks like:
 <img src="./example/diting.out/heatmap.png" width="792" height="627">
 
 ## Copyright

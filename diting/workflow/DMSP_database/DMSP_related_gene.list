@@ -1,27 +1,28 @@
-AcuH	1e-56	custom	-	-	-
-Alma1	1e-26	custom	-	-	-
-DddD	1e-97	custom	-	-	-
-DddK	1e-35	custom	-	-	-
-DddL	1e-33	custom	-	-	-
-DddP	1e-83	custom	-	-	-
-DddQ	1e-20	custom	-	-	-
-DddW	1e-49	custom	-	-	-
-DddY	1e-64	custom	-	-	-
-DmdA	1e-130	custom	-	-	-
-DmdB	1e-75	custom	-	-	-
-DmdC	1e-100	custom	-	-	-
-DmdD	1e-30	custom	-	-	-
-DmoA	1e-34	custom	-	-	-
-DorA	1e-94	custom	-	-	-
-DsyB_prok	1e-67	custom	-	-	-
-DSYB_euka	1e-30	custom	-	-	-
-MddA	1e-30	custom	-	-	-
-MmtN	1e-98	custom	-	-	-
-MTO	1e-20	custom	-	-	-
-IsoA	1e-45	custom	-	-	-
-SQ_dehydrogenase	3e-143	custom	-	-	-
-SGL_lactonase	5e-165	custom	-	-	-
-SG_dehydratase	1e-146	custom	-	-	-
-KDSG_aldolase	1e-154	custom	-	-	-
-SLA_dehydrogenase	2e-178	custom	-	-	-
-SF_transaldolase	2.1e-41	custom	-	-	-
+knum	threshold	score_type	profile_type	F-measure	nseq	nseq_used	alen	mlen	eff_nseq	re/pos	definition
+AcuH	1.00E-56	custom	-	-	-	-	-	-	-	-	AcuH
+Alma1	1.00E-26	custom	-	-	-	-	-	-	-	-	Alma1
+DddD	1.00E-97	custom	-	-	-	-	-	-	-	-	DddD
+DddK	1.00E-35	custom	-	-	-	-	-	-	-	-	DddK
+DddL	1.00E-33	custom	-	-	-	-	-	-	-	-	DddL
+DddP	1.00E-83	custom	-	-	-	-	-	-	-	-	DddP
+DddQ	1.00E-20	custom	-	-	-	-	-	-	-	-	DddQ
+DddW	1.00E-49	custom	-	-	-	-	-	-	-	-	DddW
+DddY	1.00E-64	custom	-	-	-	-	-	-	-	-	DddY
+DmdA	1.00E-130	custom	-	-	-	-	-	-	-	-	DmdA
+DmdB	1.00E-75	custom	-	-	-	-	-	-	-	-	DmdB
+DmdC	1.00E-100	custom	-	-	-	-	-	-	-	-	DmdC
+DmdD	1.00E-30	custom	-	-	-	-	-	-	-	-	DmdD
+DmoA	1.00E-34	custom	-	-	-	-	-	-	-	-	DmoA
+DorA	1.00E-94	custom	-	-	-	-	-	-	-	-	DorA
+DsyB_prok	1.00E-67	custom	-	-	-	-	-	-	-	-	DsyB_prok
+DSYB_euka	1.00E-30	custom	-	-	-	-	-	-	-	-	DSYB_euka
+MddA	1.00E-30	custom	-	-	-	-	-	-	-	-	MddA
+MmtN	1.00E-98	custom	-	-	-	-	-	-	-	-	MmtN
+MTO	1.00E-20	custom	-	-	-	-	-	-	-	-	MTO
+IsoA	1.00E-45	custom	-	-	-	-	-	-	-	-	IsoA
+SQ_dehydrogenase	3.00E-143	custom	-	-	-	-	-	-	-	-	SQ_dehydrogenase
+SGL_lactonase	5.00E-165	custom	-	-	-	-	-	-	-	-	SGL_lactonase
+SG_dehydratase	1.00E-146	custom	-	-	-	-	-	-	-	-	SG_dehydratase
+KDSG_aldolase	1.00E-154	custom	-	-	-	-	-	-	-	-	KDSG_aldolase
+SLA_dehydrogenase	2.00E-178	custom	-	-	-	-	-	-	-	-	SLA_dehydrogenase
+SF_transaldolase	2.10E-41	custom	-	-	-	-	-	-	-	-	SF_transaldolase

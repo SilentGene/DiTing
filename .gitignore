@@ -1,4 +1,4 @@
-##ignore this file##
+__pycache__/
 /.idea/
 
 # OS generated files #

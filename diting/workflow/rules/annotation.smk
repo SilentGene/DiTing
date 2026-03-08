@@ -26,22 +26,36 @@ rule dmsp_annotation:
     input:
         faa = os.path.join(out_dir, "ORFs", "{sample}.faa")
     output:
-        raw = temp(os.path.join(out_dir, "DMSP_annotation", "pfamscan_out", "{sample}-dmsp-annotations.tsv")),
-        filtered = os.path.join(out_dir, "DMSP_annotation", "pfamscan_out", "{sample}-dmsp-annotations-filtered.tsv")
+        filtered = os.path.join(out_dir, "DMSP_annotation", "hmmout", "{sample}-dmsp-annotations-filtered.tsv")
     threads: 4 
     log:
         os.path.join(out_dir, "logs", "dmsp_annotation_{sample}.log")
     run:
         import os
-        pfamscan_out_dir = os.path.join(out_dir, "DMSP_annotation", "pfamscan_out")
-        os.makedirs(pfamscan_out_dir, exist_ok=True)
-        tmp_dir = os.path.join(pfamscan_out_dir, f"{wildcards.sample}-dmsp-tmp")
+        hmmout_dir = os.path.join(out_dir, "DMSP_annotation", "hmmout")
+        os.makedirs(hmmout_dir, exist_ok=True)
         dmsp_profiles_dir = os.path.join(DMSP_DIR, "profiles")
         dmsp_list = os.path.join(DMSP_DIR, "DMSP_related_gene.list")
         
-        shell(f"exec_annotation -p {dmsp_profiles_dir} -k {dmsp_list} --cpu {threads} -f detail-tsv --e-value 1e-5 --tmp-dir {tmp_dir} -o {output.raw} {input.faa} > {{log}} 2>&1")
+        # Read evalues from dmsp_list
+        evalues = {}
+        with open(dmsp_list, 'r') as f:
+            for line in f:
+                if line.startswith('knum'): continue
+                if not line.strip(): continue
+                parts = line.strip().split('\t')
+                if len(parts) >= 2:
+                    knum = parts[0]
+                    evalue = parts[1]
+                    evalues[knum] = evalue
         
-        filter_script = os.path.join(workflow.basedir, "scripts", "kofamscan_filter.py")
-        shell(f"python {filter_script} -i {output.raw} -o {output.filtered} -s {wildcards.sample} -E 1e-5 >> {{log}} 2>&1")
+        # Run hmmsearch per profile
+        for knum, evalue in evalues.items():
+            hmm_profile = os.path.join(dmsp_profiles_dir, f"{knum}.hmm")
+            if os.path.exists(hmm_profile):
+                out_hmmout = os.path.join(hmmout_dir, f"{knum}.{wildcards.sample}.hmmout")
+                shell(f"hmmsearch -o /dev/null --tblout {out_hmmout} -E {evalue} --cpu {threads} {hmm_profile} {input.faa} >> {{log}} 2>&1")
         
-        shell(f"rm -rf {tmp_dir}")
+        # Filter best hits
+        filter_script = os.path.join(workflow.basedir, "scripts", "dmsp_filter.py")
+        shell(f"python {filter_script} -i {hmmout_dir} -o {output.filtered} -s {wildcards.sample} >> {{log}} 2>&1")

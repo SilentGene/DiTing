@@ -199,7 +199,7 @@ def merge_abun_ko(abun_table_dir, ko_merged_tab, output):
         gene_id = item.split('\t')[1]
         k_number = item.split('\t')[2]
         key = basename + '+' + gene_id
-        abundance = abun_tab_dict[key]
+        abundance = abun_tab_dict.get(key, '0')
         with open(output, 'a') as fo:
             fo.write(basename + '\t' + k_number + '\t' + abundance + '\t' + gene_id + '\n')
 
@@ -229,10 +229,12 @@ def build_gene_family(ORF_dir, ko_abun_txt, output_dir):
                 k_number = line.split('\t')[1]
                 gene_id = line.split('\t')[3]
                 sample_gene_id = sample + '+' + gene_id
-                output_file = k_number + ".faa"
-                output_file_path = os.path.join(output_dir, output_file)
-                with open(output_file_path, 'a') as fo:
-                    fo.write(geneID_to_sequence[sample_gene_id])
+                
+                if sample_gene_id in geneID_to_sequence:
+                    output_file = k_number + ".faa"
+                    output_file_path = os.path.join(output_dir, output_file)
+                    with open(output_file_path, 'a') as fo:
+                        fo.write(geneID_to_sequence[sample_gene_id])
 
 
 #produce table of ko abundance among samples

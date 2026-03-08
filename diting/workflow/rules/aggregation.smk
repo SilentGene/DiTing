@@ -1,7 +1,7 @@
 rule merge_annotations:
     input:
         kegg_filtered = expand(os.path.join(out_dir, "KEGG_annotation", "pfamscan_out", "{sample}-ko-annotations-filtered.tsv"), sample=BASENAMES),
-        dmsp_filtered = expand(os.path.join(out_dir, "DMSP_annotation", "pfamscan_out", "{sample}-dmsp-annotations-filtered.tsv"), sample=BASENAMES)
+        dmsp_filtered = expand(os.path.join(out_dir, "DMSP_annotation", "hmmout", "{sample}-dmsp-annotations-filtered.tsv"), sample=BASENAMES)
     output:
         ko_merged = os.path.join(out_dir, "KEGG_annotation", "ko_merged.txt")
     log:
