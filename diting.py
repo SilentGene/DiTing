@@ -49,15 +49,10 @@ def main():
             logging.info(cmd_rm_ko_database)
             os.system(cmd_rm_ko_database)
             download_db(KODB_DIR)
-            DMSP_db_parse(DMSP_DIR, KODB_DIR)
         else:
             logging.info("The KEGG database is set")
 
-        if check_DMSP_db(KODB_DIR) is False:
-            logging.info("The DMSP database is not parsed yet")
-            DMSP_db_parse(DMSP_DIR, KODB_DIR)
-        else:
-            logging.info("The DMSP database is set")
+
 
         """
         Check assemblies / reads & Get input basename

@@ -10,7 +10,7 @@ To cite DiTing please use
 > Xue CX, Lin H, Zhu XY, Liu J, Zhang Y, Rowley G, Todd JD, Li M, Zhang XH. DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways From Metagenomic and Metatranscriptomic Data. Front Microbiol. 2021 Aug 2;12:698286. doi: 10.3389/fmicb.2021.698286.    
 
 ## Introduction
-DiTing is designed to determine the relative abundance of metabolic and biogeochemical functional pathways in a set of given metagenomic/metatranscriptomic data. The input is expected to be a folder containing a group of paired-end clean reads. These reads will be assembled, annotated, and parsed for producing a table of relative abundance of elemental/biogeochemical cycling pathways (e.g., Nitrogen, Carbon, Sulfur) in each sample. Sketch maps and heatmaps will also be produced accordingly for comparing biogeochemical functions visually.
+DiTing is designed to determine the relative abundance of metabolic and biogeochemical functional pathways in a set of given metagenomic/metatranscriptomic data. The input is expected to be a folder containing a group of paired-end clean reads. These reads will be assembled, annotated, and parsed for producing a table of relative abundance of elemental/biogeochemical cycling pathways (e.g., Nitrogen, Carbon, Sulfur, and DMSP) in each sample. Sketch maps and heatmaps will also be produced accordingly for comparing biogeochemical functions visually.
 
 ## Procedure
 ![image](./Flow_chart.png)
@@ -35,28 +35,18 @@ CPU threads ≥ 8
 RAM ≥ 64 Gb
 ```
 
-### Option 1: Conda Environment Setup (Recommended)
-You can build the completely reproducible stack straight from the `environment.yaml`:
+### Conda Environment Setup
 
 ```bash
 # 1. Download the repo
 git clone https://github.com/xuechunxu/DiTing.git
 cd DiTing
 
-# 2. Build the exact environment mapping resolving all snakemake dependencies
+# 2. Build the conda environment called 'diting'
 conda env create -f environment.yaml
 
 # 3. Activate the environment
-conda activate diting-env
-```
-Once inside the environment, the `diting` CLI command will be available natively as an entry point. 
-
-### Option 2: Build from Source
-If setting up via pure pip, you need to ensure the `Dependencies` outlined above are already correctly placed onto your system PATH, then:
-```bash
-git clone https://github.com/xuechunxu/DiTing.git
-cd DiTing
-pip install -e .
+conda activate diting
 ```
 
 #### Database Downloads
@@ -65,14 +55,26 @@ DiTing requires [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala
 ```bash
 diting-download-db -o <kofam_database>
 ```
-This will download `ko_list` and the profile HMMs into the specified directory.
+This will download `ko_list` and the profile HMMs folder `profiles` into the specified directory. Otherwise, you can download the database manually and extract it into the specified directory.
+
+```bash
+mkdir kofam_database
+cd kofam_database
+wget -c ftp://ftp.genome.jp/pub/db/kofam/ko_list.gz 
+wget -c ftp://ftp.genome.jp/pub/db/kofam/profiles.tar.gz 
+gzip -d ko_list.gz
+tar zxvf profiles.tar.gz 
+```
 
 ## Running
 ### 1. One step running
 
 ```bash
+# from reads (interleaved or paired-end)
 diting -r <clean_reads_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
-diting -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
+
+# from assembly (contigs)
+diting -a <metagenomic_assembly_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 ```
 Example reads run:  
 ```bash
@@ -85,7 +87,7 @@ unzip Clean-reads_interleaved.zip
 # run Example
 diting -r Clean-reads_interleaved -o Clean-reads_interleaved.diting.out -p kofam_database/profiles -k kofam_database/ko_list
 ```
-The input is the `<clean_reads_dir>` folder containing a group of paired-end metagenomic clean reads, looks like: 
+The input is the `<clean_reads_dir>` folder containing a group of paired-end metagenomic clean reads, looking like: 
 ```
 sample_one_1.fastq
 sample_one_2.fastq
@@ -94,7 +96,12 @@ sample_three_1.fastq
 sample_three_2.fastq
 ```
 The paired-end metagenomic clean reads should end with `.fq`, `.fq.gz`, `.fastq`, or `.fastq.gz`.
-The interleaved reads are also supported.
+The interleaved reads are also supported, looking like:
+```
+sample_one.fq.gz
+sample_two.fq.gz
+sample_three.fq.gz
+```
 
 ### 2. Optional parameter
 #### 2.1 --spades
@@ -147,7 +154,7 @@ diting -r <clean_reads_dir> -o <output_dir> --dry-run -p <profiles_dir> -k <ko_l
 #### 3.2 Visualization
 - `carbon_cycle_sketch.png`, `nitrogen_cycle_sketch.png`, `DMSP_cycle_sketch.png` and `sulfur_cycle_sketch.png`
 Sketch maps regarding carbon, nitrogen and sulfur cycles
-- `carbon_cycle_heatmap.pdf`, `nitrogen_cycle_heatmap.pdf`, `sulfur_cycle_heatmap.pdf` and `other_cycle_heatmap.pdf`
+- `carbon_cycle_heatmap.pdf(.png)`, `nitrogen_cycle_heatmap.pdf(.png)`, `sulfur_cycle_heatmap.pdf(.png)` and `other_cycle_heatmap.pdf(.png)`
 Heatmaps regarding carbon, nitrogen, sulfur cycles and other pathways
 
 Example:

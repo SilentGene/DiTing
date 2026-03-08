@@ -207,6 +207,7 @@ def heatmap(abundance_table):
         # specify dimensions and save
         fig.set_size_inches(8.27, 11.69)
         out_name = i.split('.tab')[0]
+        fig.savefig(out_name + '_heatmap.png', bbox_inches = 'tight', dpi = 600)
         fig.savefig(out_name + '_heatmap.pdf', bbox_inches = 'tight', dpi = 600)
         plt.close()
 

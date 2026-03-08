@@ -1,6 +1,7 @@
 rule merge_annotations:
     input:
-        filtered = expand(os.path.join(out_dir, "KEGG_annotation", "pfamscan_out", "{sample}-ko-annotations-filtered.tsv"), sample=BASENAMES)
+        kegg_filtered = expand(os.path.join(out_dir, "KEGG_annotation", "pfamscan_out", "{sample}-ko-annotations-filtered.tsv"), sample=BASENAMES),
+        dmsp_filtered = expand(os.path.join(out_dir, "DMSP_annotation", "pfamscan_out", "{sample}-dmsp-annotations-filtered.tsv"), sample=BASENAMES)
     output:
         ko_merged = os.path.join(out_dir, "KEGG_annotation", "ko_merged.txt")
     log:
@@ -8,9 +9,33 @@ rule merge_annotations:
     run:
         with open(output.ko_merged, 'w') as fo:
             fo.write('#sample\tgene_id\tk_number\n')
-            for f in input.filtered:
-                with open(f, 'r') as fi:
-                    fo.write(fi.read())
+            for kegg_f, dmsp_f in zip(input.kegg_filtered, input.dmsp_filtered):
+                kegg_hits = {}
+                with open(kegg_f, 'r') as fi:
+                    for line in fi:
+                        if line.startswith('#'): continue
+                        if not line.strip(): continue
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 3:
+                            gene = parts[1]
+                            kegg_hits[gene] = line
+                
+                dmsp_hits = {}
+                with open(dmsp_f, 'r') as fi:
+                    for line in fi:
+                        if line.startswith('#'): continue
+                        if not line.strip(): continue
+                        parts = line.strip().split('\t')
+                        if len(parts) >= 3:
+                            gene = parts[1]
+                            dmsp_hits[gene] = line
+                
+                all_genes = sorted(list(set(kegg_hits.keys()) | set(dmsp_hits.keys())))
+                for gene in all_genes:
+                    if gene in dmsp_hits:
+                        fo.write(dmsp_hits[gene])
+                    else:
+                        fo.write(kegg_hits[gene])
 
 rule merge_abun_ko:
     input:

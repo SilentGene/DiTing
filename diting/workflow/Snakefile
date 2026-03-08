@@ -44,7 +44,6 @@ rule all:
         if not vis_file else []
 
 # Include rule files
-include: "rules/setup_db.smk"
 include: "rules/assembly.smk"
 include: "rules/mapping.smk"
 include: "rules/annotation.smk"
