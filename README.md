@@ -5,13 +5,19 @@
 ![Python](https://img.shields.io/badge/python-%E2%89%A53.9-blue)
 ![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A59.0-brightgreen)
 
+> [!NOTE]
+> **🚀 Major Update (v2.0):** DiTing has been boosted to version 2! Compared to the initially published version, this release introduces several significant upgrades:
+> 1. **Complete Architecture Rewrite**: The entire pipeline has been rewritten using `Snakemake`, providing robust workflow management, better parallelization, and the ability to resume execution from breakpoints.
+> 2. **Enhanced Annotation Engine**: We have replaced the manual `hmmsearch` parsing system with the standardized `kofamscan` engine for KEGG annotations. This effectively resolves the frequent parsing errors and compatibility issues previously encountered with raw `hmmsearch` outputs.
+> 3. **Maintenance Notice**: DiTing is no longer under highly active development. However, if you encounter any issues during usage, please feel free to open an issue on GitHub, and we will do our best to address it!
+
 ## Etymology
 **DiTing** is a Chinese mythical creature who knows everything when he puts his ears to the earth's surface. Similarly, this program is developed to accurately and efficiently recognize biogeochemical cycles from environmental omic data.    
 **谛听 (DiTing)** 若伏在地下，一霎时，便可将四大部洲山川社稷、洞天福地之间，蠃虫、鳞虫、毛虫、羽虫、昆虫，天仙、地仙、神仙、人仙、鬼仙，顾鉴善恶，察听贤愚。
 
 ## Citation
 To cite DiTing please use  
-> Xue CX, Lin H, Zhu XY, Liu J, Zhang Y, Rowley G, Todd JD, Li M, Zhang XH. DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways From Metagenomic and Metatranscriptomic Data. Front Microbiol. 2021 Aug 2;12:698286. doi: 10.3389/fmicb.2021.698286.    
+> Xue CX, Lin H, Zhu XY, Liu J, Zhang Y, Rowley G, Todd JD, Li M, Zhang XH. DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways From Metagenomic and Metatranscriptomic Data. Front Microbiol. 2021 Aug 2;12:698286. doi: [10.3389/fmicb.2021.698286](https://doi.org/10.3389/fmicb.2021.698286).    
 
 ## Introduction
 DiTing is designed to determine the relative abundance of metabolic and biogeochemical functional pathways in a set of given metagenomic or metatranscriptomic data. The input should be a folder containing a group of paired-end clean reads. These reads will be assembled, annotated, and parsed to produce a table detailing the relative abundance of elemental and biogeochemical cycling pathways (e.g., Nitrogen, Carbon, Sulfur, and DMSP) in each sample. Sketch maps and heatmaps will also be produced to visually compare these biogeochemical functions.
