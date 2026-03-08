@@ -177,18 +177,18 @@ def main():
         """
         logging.info("[7/12] KEGG annotation by hmmsearch".center(50, '*'))
         make_dir(KEGG_DIR)
-        kegg_pieces_dir = os.path.join(KEGG_DIR, 'hmmout')  # containing KEGG annotations of every knum
-        make_dir(kegg_pieces_dir)
+        kegg_pfam_out_dir = os.path.join(KEGG_DIR, 'pfamscan_out')  # containing KEGG annotations of every knum
+        make_dir(kegg_pfam_out_dir)
         for bn in BASENAMES:
             faa = os.path.join(PRODIGAL_DIR, bn + '.faa')
-            kegg_annotation(faa, bn, kegg_pieces_dir, KODB_DIR, ko_dic, THREADS)
+            kegg_annotation(faa, bn, kegg_pfam_out_dir, KODB_DIR, ko_dic, THREADS)
     
         """
         [7/12] Merge KEGG annotations
         """
         logging.info("[8/12] Merge KEGG annotations".center(50, '*'))
         ko_merged_tab = os.path.join(KEGG_DIR, 'ko_merged.txt')
-        merge_ko(kegg_pieces_dir, ko_merged_tab)
+        merge_ko(kegg_pfam_out_dir, ko_merged_tab)
     
         """
         [8/12] Merge KEGG annotations and gene relative abundances

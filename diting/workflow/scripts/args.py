@@ -31,5 +31,5 @@ parser.add_argument('--spades', metavar='Using_metaSpades', dest='spades',
 parser.add_argument('-m', '--memory', metavar='memory', dest='m',
                     type=int, default=50,
                     help='Memory that will be used by metaSPAdes (in Gb). Default=50G')
-args = parser.parse_args()
+args = parser.parse_known_args()[0]
 

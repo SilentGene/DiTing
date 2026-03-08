@@ -5,6 +5,8 @@ rule setup_db:
         # but we can use them as triggers or just keep the rule for DMSP parsing.
         ko_profile_sample = os.path.join(KODB_DIR, "K00001.hmm"),
         dmsp_profile = os.path.join(KODB_DIR, "AcuH.hmm")
+    log:
+        os.path.join(out_dir, "logs", "setup_db.log")
     run:
         from scripts.check import check_kodb, check_DMSP_db
         from scripts.func import DMSP_db_parse

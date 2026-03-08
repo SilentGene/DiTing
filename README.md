@@ -69,13 +69,8 @@ This will download `ko_list` and the profile HMMs into the specified directory.
 
 ## Running
 ### 1. One step running
-Instead of invoking `python diting.py`, the CLI automatically handles forming connections into the `Snakemake` pipeline.
 
 ```bash
-# 1. Download database
-diting-download-db -o kofam_database
-
-# 2. Run dieting
 diting -r <clean_reads_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 diting -r <clean_reads_dir> -a <metagenomic_assembly> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 ```

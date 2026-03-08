@@ -66,7 +66,7 @@ def sketch(abundance_table):
     
     
     # background dir pathway
-    self_script_pathway = sys.path[0]
+    self_script_pathway = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     #print(self_script_pathway)
     background_image_pathway = self_script_pathway + "/figure"
     

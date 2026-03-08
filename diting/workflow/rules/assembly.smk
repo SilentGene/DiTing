@@ -14,22 +14,24 @@ rule assemble:
         reads = get_reads
     output:
         fa = os.path.join(out_dir, "Assembly", "{sample}.fa")
-    threads: threads_cli
+    threads: 8
+    log:
+        os.path.join(out_dir, "logs", "assemble_{sample}.log")
     run:
         tmp_dir = os.path.join(out_dir, "assembly_tmp_" + wildcards.sample)
         shell(f"rm -rf {tmp_dir}")
         if use_spades:
             if READS_INTER:
-                shell(f"spades.py --meta --12 {input.reads[0]} -t {threads} -o {tmp_dir} -m {memory}")
+                shell(f"spades.py --meta --12 {input.reads[0]} -t {threads} -o {tmp_dir} -m {memory} > {{log}} 2>&1")
             else:
-                shell(f"spades.py --meta -1 {input.reads[0]} -2 {input.reads[1]} -t {threads} -o {tmp_dir} -m {memory}")
-            shell(f"cp {tmp_dir}/contigs.fasta {output.fa}")
+                shell(f"spades.py --meta -1 {input.reads[0]} -2 {input.reads[1]} -t {threads} -o {tmp_dir} -m {memory} > {{log}} 2>&1")
+            shell(f"cp {tmp_dir}/contigs.fasta {output.fa} >> {{log}} 2>&1")
         else:
             if READS_INTER:
-                shell(f"megahit --12 {input.reads[0]} -t {threads} -o {tmp_dir} -f")
+                shell(f"megahit --12 {input.reads[0]} -t {threads} -o {tmp_dir} -f > {{log}} 2>&1")
             else:
-                shell(f"megahit -1 {input.reads[0]} -2 {input.reads[1]} -t {threads} -o {tmp_dir} -f")
-            shell(f"cp {tmp_dir}/final.contigs.fa {output.fa}")
+                shell(f"megahit -1 {input.reads[0]} -2 {input.reads[1]} -t {threads} -o {tmp_dir} -f > {{log}} 2>&1")
+            shell(f"cp {tmp_dir}/final.contigs.fa {output.fa} >> {{log}} 2>&1")
         shell(f"rm -rf {tmp_dir}")
 
 rule prodigal:
@@ -38,5 +40,7 @@ rule prodigal:
     output:
         faa = os.path.join(out_dir, "ORFs", "{sample}.faa"),
         ffn = os.path.join(out_dir, "ORFs", "{sample}.ffn")
+    log:
+        os.path.join(out_dir, "logs", "prodigal_{sample}.log")
     shell:
-        "prodigal -i {input.assembly} -a {output.faa} -d {output.ffn} -p meta -q"
+        "prodigal -i {input.assembly} -a {output.faa} -d {output.ffn} -p meta -q > {log} 2>&1"

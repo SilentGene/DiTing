@@ -6,32 +6,46 @@ import os
 import sys
 from .args import *
 
-if args.vis:
-    ABUNDANCE_TABLE = args.vis
+# Defensive access to args
+arg_o = getattr(args, 'o', None)
+arg_r = getattr(args, 'r', None)
+arg_n = getattr(args, 'n', 4)
+arg_m = getattr(args, 'm', 50)
+arg_a = getattr(args, 'a', None)
+arg_vis = getattr(args, 'vis', False)
+
+if arg_vis:
+    ABUNDANCE_TABLE = arg_vis
 else:
-    READS_DIR = args.r  # directory for input fastq reads
-    OUT_DIR = args.o  # directory for output results
-    THREADS = args.n  # threads will be used
-    MEM = args.m  # memory will be used by metaSPAdes (in Gb)
-    ASSEMBLY_TMP = os.path.join(OUT_DIR, 'assembly_tmp')  # directory for megahit temporary files
-    PRODIGAL_DIR = os.path.join(OUT_DIR, 'ORFs')  # directory for predicted ORFs
-    BBMAP_DIR = os.path.join(OUT_DIR, 'BBMap')  # directory for predicted ORFs
-    GENE_ABUN_DIR = os.path.join(OUT_DIR, 'Abundance')  # directory for gene relative abundance
-    KEGG_DIR = os.path.join(OUT_DIR, 'KEGG_annotation')  # directory for KEGG annotations
-    ROOT_DIR = sys.path[0]
-    KODB_DIR = os.path.join(ROOT_DIR, 'kofam_database')  # downloaded kofam_database folder from KEGG website
-    DMSP_DIR = os.path.join(ROOT_DIR, 'DMSP_database')
-    TABLE = os.path.join(ROOT_DIR, 'table')
-    GENE_FAMILY = os.path.join(OUT_DIR, 'Gene_family')
-    READS_INTER = None  # if reads are interleaved or not
-
-    BASENAMES = []  # input files basename list
-    READS_SUF = ''  # suffix of input reads
-    ASSEMBLY_SUF = 'fa'  # suffix of assemblies
-
-    if args.a:
-        ASSEMBLY_DIR = args.a
+    READS_DIR = arg_r
+    OUT_DIR = arg_o
+    THREADS = arg_n
+    MEM = arg_m
+    
+    if OUT_DIR:
+        ASSEMBLY_TMP = os.path.join(OUT_DIR, 'assembly_tmp')
+        PRODIGAL_DIR = os.path.join(OUT_DIR, 'ORFs')
+        BBMAP_DIR = os.path.join(OUT_DIR, 'BBMap')
+        GENE_ABUN_DIR = os.path.join(OUT_DIR, 'Abundance')
+        KEGG_DIR = os.path.join(OUT_DIR, 'KEGG_annotation')
+        GENE_FAMILY = os.path.join(OUT_DIR, 'Gene_family')
+        ASSEMBLY_DIR = arg_a if arg_a else os.path.join(OUT_DIR, 'Assembly')
     else:
-        ASSEMBLY_DIR = os.path.join(OUT_DIR, 'Assembly')  # directory for assembled contigs
+        ASSEMBLY_TMP = None
+        PRODIGAL_DIR = None
+        BBMAP_DIR = None
+        GENE_ABUN_DIR = None
+        KEGG_DIR = None
+        GENE_FAMILY = None
+        ASSEMBLY_DIR = arg_a
 
-    ABUNDANCE_TABLE = 'pathways_relative_abundance.tab'  # table for visulization
+    ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    KODB_DIR = os.path.join(ROOT_DIR, 'kofam_database') if ROOT_DIR else 'kofam_database'
+    DMSP_DIR = os.path.join(ROOT_DIR, 'DMSP_database') if ROOT_DIR else 'DMSP_database'
+    TABLE = os.path.join(ROOT_DIR, 'table') if ROOT_DIR else 'table'
+    READS_INTER = None
+
+    BASENAMES = []
+    READS_SUF = ''
+    ASSEMBLY_SUF = 'fa'
+    ABUNDANCE_TABLE = 'pathways_relative_abundance.tab'

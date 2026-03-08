@@ -1,6 +1,7 @@
 """
 Provides in-house functions
 """
+import os
 import re
 import urllib.request
 import shutil
@@ -310,7 +311,7 @@ def hierarchical_ko_abundance_among_samples(table_of_ko_abundance_among_samples,
 
 def kegg_decoder(input_tab, output):
     logging.info('Decode KEGG annotations')
-    self_script_pathway = sys.path[0]
+    self_script_pathway = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
     kegg_decoder_meta_py = os.path.join(self_script_pathway, 'accessory-scripts', 'KEGG-decoder_meta.py')
     cmd_para = [
                 'python',

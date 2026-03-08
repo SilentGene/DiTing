@@ -6,6 +6,8 @@ rule visualization:
                    out_dir=[out_dir] if not vis_file else [os.path.dirname(vis_file) or "."], 
                    cycle=["carbon_cycle", "nitrogen_cycle", "DMSP_cycle", "sulfur_cycle"], 
                    type=["sketch"])
+    log:
+        os.path.join(out_dir, "logs", "visualization.log")
     run:
         from scripts.sketch import sketch
         from scripts.heatmap import heatmap
