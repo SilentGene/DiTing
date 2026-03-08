@@ -83,8 +83,8 @@ tar zxvf profiles.tar.gz
 # from reads (interleaved or paired-end)
 diting -r <clean_reads_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 
-# from assembly (contigs)
-diting -a <metagenomic_assembly_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
+# from reads and assembly (contigs)
+diting -r <clean_reads_dir> -a <metagenomic_assembly_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 ```
 Example reads run:  
 ```bash
@@ -173,6 +173,39 @@ Example:
 
 `heatmap` looks like:
 <img src="./example/diting.out/heatmap.png" width="792" height="627">
+
+## Parameters
+```powershell
+$ diting -h
+usage: diting [-h] [-r input_reads] [-o output_dir] [-a metagenomic_assembly] [-n threads] [--noclean]
+              [-vis pathways_relative_abundance.tab] [-p profiles_dir] [-k ko_list] [--spades] [-m memory] [--dry-run]
+              [--snakemake-args ...]
+
+DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways
+
+options:
+  -h, --help            show this help message and exit
+  -r, --reads input_reads
+                        folder containing reads to be used as input
+  -o, --outdir output_dir
+                        output directory
+  -a, --assembly metagenomic_assembly
+                        folder containing metagenomic assemblies corresponding to provided reads, which should have the same basename as the
+                        reads
+  -n, --threads threads
+                        threads that will be used
+  --noclean             The sam files would be retained if this flag is used
+  -vis, --visualization pathways_relative_abundance.tab
+                        A table for visualization
+  -p, --profiles profiles_dir
+                        folder containing kofam profiles (*.hmm)
+  -k, --ko-list ko_list
+                        ko_list file
+  --spades              metaSPAdes will be used for assembling instead of megahit if this flag is used
+  -m, --memory memory   Memory that will be used by metaSPAdes (in Gb). Default=50G
+  --dry-run             Perform a dry run of the snakemake pipeline
+  --snakemake-args ...  Additional arguments to pass to snakemake
+```
 
 ## Copyright
 Xue Chunxu, xuechunxu (at) outlook.com  
