@@ -49,7 +49,7 @@ RAM ≥ 64 Gb
 
 ```bash
 # 1. Download the repo
-git clone https://github.com/xuechunxu/DiTing.git
+git clone https://github.com/SilentGene/DiTing.git
 cd DiTing
 
 # 2. Build the conda environment called 'diting'
