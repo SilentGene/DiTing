@@ -7,9 +7,9 @@
 
 > [!NOTE]
 > **🚀 Major Update (v2.0):** DiTing has been boosted to version 2! Compared to the initially published version, this release introduces several significant upgrades:
-> 1. **Complete Architecture Rewrite**: The entire pipeline has been rewritten using `Snakemake`, providing robust workflow management, better parallelization, and the ability to resume execution from breakpoints.
-> 2. **Enhanced Annotation Engine**: We have replaced the manual `hmmsearch` parsing system with the standardized `kofamscan` engine for KEGG annotations. This effectively resolves the frequent parsing errors and compatibility issues previously encountered with raw `hmmsearch` outputs.
-> 3. **Maintenance Notice**: DiTing is no longer under highly active development. However, if you encounter any issues during usage, please feel free to open an issue on GitHub, and we will do our best to address it!
+> 1. **Rewrite using Snakemake**: The entire pipeline has been rewritten using `Snakemake`, providing robust workflow management, better parallelization, and the ability to **resume execution from breakpoints**.
+> 2. **Upgrade annotation engine (kofamscan)**: We have replaced the manual `hmmsearch` parsing system with the standardized `kofamscan` engine for KEGG annotations. This effectively resolves the frequent parsing errors and compatibility issues previously encountered with raw `hmmsearch` outputs.
+> DiTing is no longer under highly active development. However, if you encounter any issues during usage, please feel free to open an issue on GitHub, and we will do our best to address it!
 
 ## Etymology
 **DiTing** is a Chinese mythical creature who knows everything when he puts his ears to the earth's surface. Similarly, this program is developed to accurately and efficiently recognize biogeochemical cycles from environmental omic data.    
@@ -26,7 +26,7 @@ DiTing is designed to determine the relative abundance of metabolic and biogeoch
 ![image](./Flow_chart.png)
 
 ## Dependencies
-DiTing now relies on **Snakemake >= 9.0** to orchestrate the pipeline and uses `hatchling` to package the modules. The underlying bioinformatics dependencies remain:
+DiTing now relies on **Snakemake >= 9.0** to manage the pipeline. The underlying bioinformatics dependencies remain:
 * [Megahit](https://github.com/voutcn/megahit)
 * [SPAdes](https://cab.spbu.ru/software/spades/)
 * [Prodigal](https://github.com/hyattpd/Prodigal)
@@ -45,7 +45,13 @@ CPU threads ≥ 8
 RAM ≥ 64 Gb
 ```
 
-### Conda Environment Setup
+### Option 1: Install from Bioconda (Recommended)
+
+```bash
+conda create -n diting -c bioconda diting
+```
+
+### Option 2:Install from source
 
 ```bash
 # 1. Download the repo
@@ -59,7 +65,7 @@ conda env create -f environment.yaml
 conda activate diting
 ```
 
-#### Database Downloads
+### Database Downloads
 DiTing requires [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala/). You can download and extract the database using the following command:
 
 ```bash

@@ -5,7 +5,7 @@ rule kegg_annotation:
     output:
         raw = temp(os.path.join(out_dir, "KEGG_annotation", "pfamscan_out", "{sample}-ko-annotations.tsv")),
         filtered = os.path.join(out_dir, "KEGG_annotation", "pfamscan_out", "{sample}-ko-annotations-filtered.tsv")
-    threads: 4 
+    threads: max(2, min(8, int(threads_cli) // max(1, len(BASENAMES))))
     log:
         os.path.join(out_dir, "logs", "kegg_annotation_{sample}.log")
     run:
@@ -27,7 +27,7 @@ rule dmsp_annotation:
         faa = os.path.join(out_dir, "ORFs", "{sample}.faa")
     output:
         filtered = os.path.join(out_dir, "DMSP_annotation", "hmmout", "{sample}-dmsp-annotations-filtered.tsv")
-    threads: 4 
+    threads: max(2, min(8, int(threads_cli) // max(1, len(BASENAMES))))
     log:
         os.path.join(out_dir, "logs", "dmsp_annotation_{sample}.log")
     run:
