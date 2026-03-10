@@ -155,6 +155,11 @@ diting -vis <pathways_relative_abundance.tab>
 Perform a dry run of the snakemake DAG pipeline to view exactly which sequence tasks execute.
 ```bash
 diting -r <clean_reads_dir> -o <output_dir> --dry-run -p <profiles_dir> -k <ko_list>
+
+#### 2.8 How to resume a failed run
+As `Snakemake` is used to manage the pipeline, we can resume a failed run by simply running the same command again.
+```bash
+diting <original_arguments>
 ```
 ### 3. Output
 #### 3.1 Table
