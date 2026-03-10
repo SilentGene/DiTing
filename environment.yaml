@@ -18,4 +18,4 @@ dependencies:
   - kofamscan
   - pip
   - pip:
-    - -e .
+    - .

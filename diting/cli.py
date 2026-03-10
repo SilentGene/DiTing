@@ -3,19 +3,21 @@ import os
 import sys
 import subprocess
 from pathlib import Path
+from diting import __version__
 
 def main():
-    parser = argparse.ArgumentParser(description="DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways")
-    parser.add_argument('-r', '--reads', metavar='input_reads', dest='r', type=str, required=False, help='folder containing reads to be used as input')
-    parser.add_argument('-o', '--outdir', metavar='output_dir', dest='o', type=str, required=False, help='output directory')
+    parser = argparse.ArgumentParser(description=f"DiTing (v{__version__}): A Pipeline to Infer and Compare Biogeochemical Pathways")
+    parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {__version__}', help='show program version number and exit')
+    parser.add_argument('-r', '--reads', metavar='input_reads', dest='r', type=str, required=True, help='folder containing reads to be used as input')
+    parser.add_argument('-o', '--outdir', metavar='output_dir', dest='o', type=str, required=True, help='output directory')
+    parser.add_argument('-p', '--profiles', metavar='profiles_dir', dest='p', type=str, required=True, help='folder containing kofam profiles (*.hmm)')
+    parser.add_argument('-k', '--ko-list', metavar='ko_list', dest='k', type=str, required=True, help='ko_list file')
     parser.add_argument('-a', '--assembly', metavar='metagenomic_assembly', dest='a', type=str, help='folder containing metagenomic assemblies corresponding to provided reads, which should have the same basename as the reads')
     parser.add_argument('-n', '--threads', metavar='threads', dest='n', type=int, default=4, help='threads that will be used')
-    parser.add_argument('--noclean', dest='nc', action='store_true', default=False, help='The sam files would be retained if this flag is used')
-    parser.add_argument('-vis', '--visualization', metavar='pathways_relative_abundance.tab', dest='vis', type=str, default=False, help='A table for visualization')
-    parser.add_argument('-p', '--profiles', metavar='profiles_dir', dest='p', type=str, required=False, help='folder containing kofam profiles (*.hmm)')
-    parser.add_argument('-k', '--ko-list', metavar='ko_list', dest='k', type=str, required=False, help='ko_list file')
-    parser.add_argument('--spades', dest='spades', action='store_true', default=False, help='metaSPAdes will be used for assembling instead of megahit if this flag is used')
     parser.add_argument('-m', '--memory', metavar='memory', dest='m', type=int, default=50, help='Memory that will be used by metaSPAdes (in Gb). Default=50G')
+    parser.add_argument('-vis', '--visualization', metavar='pathways_relative_abundance.tab', dest='vis', type=str, default=False, help='A table for visualization')
+    parser.add_argument('--spades', dest='spades', action='store_true', default=False, help='metaSPAdes will be used for assembling instead of megahit if this flag is used')
+    parser.add_argument('--noclean', dest='nc', action='store_true', default=False, help='The sam files would be retained if this flag is used')
     parser.add_argument('--dry-run', action='store_true', help='Perform a dry run of the snakemake pipeline')
     parser.add_argument('--snakemake-args', nargs=argparse.REMAINDER, help='Additional arguments to pass to snakemake')
     

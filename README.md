@@ -151,12 +151,7 @@ Visualization can also be executed independently, which allows users to adjust t
 diting -vis <pathways_relative_abundance.tab>
 ```
 
-#### 2.7 --dry-run
-Perform a dry run of the snakemake DAG pipeline to view exactly which sequence tasks execute.
-```bash
-diting -r <clean_reads_dir> -o <output_dir> --dry-run -p <profiles_dir> -k <ko_list>
-
-#### 2.8 How to resume a failed run
+#### 2.7 How to resume a failed run?
 As `Snakemake` is used to manage the pipeline, we can resume a failed run by simply running the same command again.
 ```bash
 diting <original_arguments>
@@ -181,41 +176,43 @@ Example:
 
 ## Parameters
 ```powershell
-$ diting -h
-usage: diting [-h] [-r input_reads] [-o output_dir] [-a metagenomic_assembly] [-n threads] [--noclean]
-              [-vis pathways_relative_abundance.tab] [-p profiles_dir] [-k ko_list] [--spades] [-m memory] [--dry-run]
-              [--snakemake-args ...]
+$ diting --help
+usage: diting [-h] [-v] -r input_reads -o output_dir -p profiles_dir -k ko_list [-a metagenomic_assembly] [-n threads] [-m memory]
+              [-vis pathways_relative_abundance.tab] [--spades] [--noclean] [--dry-run] [--snakemake-args ...]
 
 DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways
 
 options:
   -h, --help            show this help message and exit
+  -v, --version         show program version number and exit
   -r, --reads input_reads
                         folder containing reads to be used as input
   -o, --outdir output_dir
                         output directory
-  -a, --assembly metagenomic_assembly
-                        folder containing metagenomic assemblies corresponding to provided reads, which should have the same basename as the
-                        reads
-  -n, --threads threads
-                        threads that will be used
-  --noclean             The sam files would be retained if this flag is used
-  -vis, --visualization pathways_relative_abundance.tab
-                        A table for visualization
   -p, --profiles profiles_dir
                         folder containing kofam profiles (*.hmm)
   -k, --ko-list ko_list
                         ko_list file
-  --spades              metaSPAdes will be used for assembling instead of megahit if this flag is used
+  -a, --assembly metagenomic_assembly
+                        folder containing metagenomic assemblies corresponding to provided reads, which should have the same basename as the reads
+  -n, --threads threads
+                        threads that will be used
   -m, --memory memory   Memory that will be used by metaSPAdes (in Gb). Default=50G
+  -vis, --visualization pathways_relative_abundance.tab
+                        A table for visualization
+  --spades              metaSPAdes will be used for assembling instead of megahit if this flag is used
+  --noclean             The sam files would be retained if this flag is used
   --dry-run             Perform a dry run of the snakemake pipeline
   --snakemake-args ...  Additional arguments to pass to snakemake
+
 ```
 
-## Copyright
+## Contact
 Xue Chunxu, xuechunxu (at) outlook.com  
 Heyu Lin, heyu.lin (at) qut.edu.au  
 Xiaoyu Zhu, xiaoyuzhu321 (at) 126.com  
-Xiao-Hua Zhang, xhzhang (at) ouc.edu.cn  
+Xiao-Hua Zhang, xhzhang (at) ouc.edu.cn
+
 Lab of Microbial Oceanography  
 College of Marine Life Sciences, Ocean University of China, Qingdao 266003, China
+
