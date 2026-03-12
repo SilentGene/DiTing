@@ -48,27 +48,26 @@ RAM ≥ 64 Gb
 ### Option 1: Install from Bioconda (Recommended)
 
 ```bash
+# Create a conda environment called 'diting' and install DiTing in it
 conda create -n diting -c bioconda diting
 ```
 
-### Option 2:Install from source
+### Option 2: Install from source
 
 ```bash
 # 1. Download the repo
 git clone https://github.com/SilentGene/DiTing.git
 cd DiTing
 
-# 2. Build the conda environment called 'diting'
+# 2. Build the conda environment called 'diting' and install DiTing in it
 conda env create -f environment.yaml
-
-# 3. Activate the environment
-conda activate diting
 ```
 
 ### Database Downloads
 DiTing requires [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala/). You can download and extract the database using the following command:
 
 ```bash
+conda activate diting # Activate the environment
 diting-download-db -o <kofam_database>
 ```
 This will download `ko_list` and the profile HMMs folder `profiles` into the specified directory. Alternatively, you can download the database manually and extract it into the specified directory.
@@ -86,6 +85,7 @@ tar zxvf profiles.tar.gz
 ### 1. One step running
 
 ```bash
+conda activate diting
 # from reads (interleaved or paired-end)
 diting -r <clean_reads_dir> -o <output_dir> -p kofam_database/profiles -k kofam_database/ko_list
 
