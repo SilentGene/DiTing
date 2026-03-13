@@ -1,4 +1,4 @@
-name: diting
+name: diting2
 channels:
   - conda-forge
   - bioconda
@@ -7,14 +7,16 @@ dependencies:
   - python>=3.9
   - snakemake>=9.0
   - pandas
-  - matplotlib
+  - matplotlib-base
   - seaborn
   - megahit
   - spades
   - prodigal
   - bwa
   - bbmap
-  - hmmer
+  - hmmer>=3.3
+  - opencv
+  - pillow
   - kofamscan
   - pip
   - pip:
