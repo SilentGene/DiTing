@@ -1,7 +1,7 @@
 <img src="./DiTing_logo.jpg" width="250" height="250">
 
 # DiTing
-![Version](https://img.shields.io/badge/version-v2.0.1-blue)
+![Version](https://img.shields.io/badge/version-v2.0.2-blue)
 ![Python](https://img.shields.io/badge/python-%E2%89%A53.9-blue)
 ![Snakemake](https://img.shields.io/badge/snakemake-%E2%89%A59.0-brightgreen)
 

@@ -65,6 +65,9 @@ def check_reads(reads_dir):
     pattern = re.compile(r'(.*)(\.fq|\.fastq)(\.gz)?')
     for read in os.listdir(reads_dir):
         match_res = pattern.match(read)
+        if match_res is None:
+            logging.error(f"File '{read}' in '{reads_dir}' does not match the expected reads format (*.fq, *.fastq, *.fq.gz, *.fastq.gz).")
+            raise ValueError(f"File '{read}' in '{reads_dir}' does not match the expected reads format. Program cannot continue. Please ensure all files in the directory are valid fastq files.")
         reads_suf = ''.join(match_res.groups('')[1:])
 
         if match_res.group(1).endswith('_1'):
