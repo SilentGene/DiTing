@@ -222,3 +222,8 @@ Xiao-Hua Zhang, xhzhang (at) ouc.edu.cn
 Lab of Microbial Oceanography  
 College of Marine Life Sciences, Ocean University of China, Qingdao 266003, China
 
+## Wechat group
+
+欢迎加入DiTing微信群反馈问题和交流使用经验
+
+<img src="./example/Heyu_work_wechat.jpg" width="250" height="250">
