@@ -15,6 +15,15 @@ use_spades = str(config.get("spades", "False")).lower() == "true"
 memory = config.get("memory", 50)
 threads_cli = config.get("threads", 4)
 noclean = str(config.get("noclean", "False")).lower() == "true"
+min_seq_id = float(config.get("min_seq_id", 0.95))
+if not 0 < min_seq_id <= 1:
+    raise ValueError("min_seq_id must be greater than 0 and no greater than 1")
+
+NR_IDENTITY_TAG = f"{min_seq_id * 100:g}".replace(".", "p")
+NR_PREFIX = f"nr_linclust{NR_IDENTITY_TAG}"
+NR_DIR = os.path.join(out_dir, "Non_redundant_genes")
+NR_FFN = os.path.join(NR_DIR, f"{NR_PREFIX}_100bp.ffn")
+NR_FAA = os.path.join(NR_DIR, f"{NR_PREFIX}_100bp.faa")
 
 KODB_DIR = config.get("profiles_dir") # This is now the profiles dir
 KO_LIST = config.get("ko_list")
@@ -27,6 +36,7 @@ PATHWAY_ACCESSORY = os.path.join(workflow.basedir, 'scripts', 'accessory-scripts
 # If running the full pipeline (not just vis)
 if not vis_file:
     BASENAMES, READS_SUF, READS_INTER = check_reads(reads_dir)
+    BASENAMES = sorted(BASENAMES)
 else:
     BASENAMES = []
     READS_SUF = ''
@@ -45,6 +55,7 @@ rule all:
 
 # Include rule files
 include: "rules/assembly.smk"
+include: "rules/catalogue.smk"
 include: "rules/mapping.smk"
 include: "rules/annotation.smk"
 include: "rules/aggregation.smk"

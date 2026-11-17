@@ -171,70 +171,58 @@ def merge_ko(hmmout_dir, output):
 
 
 # merge gene relative abundance table with gene kegg annotation table
-def merge_abun_ko(abun_table_dir, ko_merged_tab, output):
+def merge_abun_ko(gene_abundance_matrix, ko_merged_tab, output):
     logging.info('Merge abundance table with kegg table')
-    with open(output, 'w') as fo:
-        fo.write('#sample\tk_number\trelative_abundance\tgene_id\n')
-    abun_tab_dict = {}
-    for abun in os.listdir(abun_table_dir):
-        if abun.endswith('.abundance'):
-            basename = abun.rsplit('.', 1)[0]
-            abun_path = os.path.join(abun_table_dir, abun)
-            with open(abun_path) as fi:
-                next(fi)
-                for line in fi:
-                    line = line.strip('\n')
-                    gene_id, abundance = line.split('\t')
-                    key = str(basename) + '+' + str(gene_id)
-                    abun_tab_dict[key] = abundance
-    a = []
-    with open(ko_merged_tab, 'r') as f:
-        for line in f:
-            if line.startswith('#'):
-                continue
-            else:
-                a.append(line.strip())
-    for item in sorted(a):
-        basename = item.split('\t')[0]
-        gene_id = item.split('\t')[1]
-        k_number = item.split('\t')[2]
-        key = basename + '+' + gene_id
-        abundance = abun_tab_dict.get(key, '0')
-        with open(output, 'a') as fo:
-            fo.write(basename + '\t' + k_number + '\t' + abundance + '\t' + gene_id + '\n')
-
-def build_gene_family(ORF_dir, ko_abun_txt, output_dir):
-    logging.info('Build gene family according to {}'.format(ko_abun_txt))
-    geneID_to_sequence = {}
-    for faa_file in os.listdir(ORF_dir):  # sample.faa
-        if faa_file.endswith('.faa'):
-            sample_name = faa_file.rsplit('.', 1)[0]  # sample
-            faa_file_path = os.path.join(ORF_dir, faa_file)
-            with open(faa_file_path, 'r') as fi:
-                contents = fi.read()
-                all_genes = contents.split(">")
-                for gene in all_genes:
-                    each_whole_gene_seq = ">" + sample_name + "+" + gene
-                    gene_id = gene.split(" # ")[0]
-                    sample_gene_id = sample_name + "+" + gene_id
-                    geneID_to_sequence[sample_gene_id] = each_whole_gene_seq
-
-    with open(ko_abun_txt) as fi:
+    abundances = {}
+    with open(gene_abundance_matrix, encoding='utf-8') as fi:
+        header = fi.readline().rstrip('\n').split('\t')
+        if not header or header[0] != 'gene_id':
+            raise ValueError('Gene abundance matrix must start with a gene_id column')
+        samples = header[1:]
         for line in fi:
-            line = line.strip('\n')
-            if line.startswith('#'):
+            fields = line.rstrip('\n').split('\t')
+            if len(fields) != len(samples) + 1:
+                raise ValueError('Malformed row in gene abundance matrix')
+            abundances[fields[0]] = fields[1:]
+
+    annotations = []
+    with open(ko_merged_tab, encoding='utf-8') as fi:
+        for line in fi:
+            if line.startswith('#') or not line.strip():
                 continue
-            else:
-                sample = line.split('\t')[0]
-                k_number = line.split('\t')[1]
-                gene_id = line.split('\t')[3]
-                sample_gene_id = sample + '+' + gene_id
-                
-                if sample_gene_id in geneID_to_sequence:
-                    output_file = k_number + ".faa"
-                    output_file_path = os.path.join(output_dir, output_file)
-                    with open(output_file_path, 'a') as fo:
-                        fo.write(geneID_to_sequence[sample_gene_id])
+            gene_id, k_number = line.rstrip('\n').split('\t')[0:2]
+            annotations.append((gene_id, k_number))
+
+    with open(output, 'w', encoding='utf-8') as fo:
+        fo.write('#sample\tk_number\trelative_abundance\tgene_id\n')
+        for gene_id, k_number in sorted(annotations):
+            gene_abundances = abundances.get(gene_id, ['0'] * len(samples))
+            for sample, abundance in zip(samples, gene_abundances):
+                fo.write(
+                    sample + '\t' + k_number + '\t' + abundance + '\t' + gene_id + '\n'
+                )
+
+def build_gene_family(catalogue_faa, ko_merged_txt, output_dir):
+    logging.info('Build gene family according to {}'.format(ko_merged_txt))
+    from scripts.fasta_io import read_fasta, write_record
+
+    sequences = {record.identifier: record for record in read_fasta(catalogue_faa)}
+    families = {}
+    with open(ko_merged_txt, encoding='utf-8') as fi:
+        for line in fi:
+            if line.startswith('#') or not line.strip():
+                continue
+            gene_id, k_number = line.rstrip('\n').split('\t')[0:2]
+            if gene_id in sequences:
+                families.setdefault(k_number, []).append(sequences[gene_id])
+
+    for existing in os.listdir(output_dir):
+        if existing.endswith('.faa'):
+            os.remove(os.path.join(output_dir, existing))
+    for k_number, records in sorted(families.items()):
+        with open(os.path.join(output_dir, k_number + '.faa'), 'w', encoding='utf-8') as fo:
+            for record in records:
+                write_record(fo, record)
 
 
 #produce table of ko abundance among samples
@@ -373,4 +361,3 @@ def pathway_parser(in_tab, output):
                 tab_string = tab_string + line2
         out_file.write(tab_string+"\n")
     out_file.close()
-

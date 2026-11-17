@@ -115,9 +115,9 @@ def main() -> None:
     )
     parser.add_argument(
         "-s", "--sample",
-        help="Sample name to prepend to output rows",
+        help="Optional sample name to prepend to output rows",
         metavar="<STR>",
-        required=True
+        default=None
     )
     parser.add_argument(
         "-E", "--evalue",
@@ -201,7 +201,10 @@ def main() -> None:
             if hit.ko_id == "NA":
                 continue
                 
-            out.write(f"{args.sample}\t{gene_id}\t{hit.ko_id}\n")
+            if args.sample:
+                out.write(f"{args.sample}\t{gene_id}\t{hit.ko_id}\n")
+            else:
+                out.write(f"{gene_id}\t{hit.ko_id}\n")
 
 
 if __name__ == "__main__":

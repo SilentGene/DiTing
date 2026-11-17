@@ -1,9 +1,6 @@
-from .invoke import *
-from .os_func import *
-from .check import *
-from .func import *
-from .variables import *
-from .transposition import *
-from .sketch import *
-from .heatmap import *
-from .logformatter import *
+"""Implementation modules used by the DiTing Snakemake workflow.
+
+Modules are intentionally imported explicitly by their callers.  Importing this
+package must not parse command-line arguments or initialize unrelated optional
+dependencies.
+"""

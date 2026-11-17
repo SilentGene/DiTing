@@ -1,51 +1,62 @@
-rule bwa_index:
-    input:
-        ffn = os.path.join(out_dir, "ORFs", "{sample}.ffn")
-    output:
-        multiext(os.path.join(out_dir, "BBMap", "bwa_index", "{sample}"), ".amb", ".ann", ".bwt", ".pac", ".sa")
-    params:
-        prefix = lambda wildcards, output: os.path.splitext(output[0])[0]
-    log:
-        os.path.join(out_dir, "logs", "bwa_index_{sample}.log")
-    shell:
-        "bwa index -p {params.prefix} {input.ffn} > {log} 2>&1"
+def get_all_reads():
+    reads = []
+    for sample in BASENAMES:
+        reads.extend(get_reads(type("Wildcards", (), {"sample": sample})()))
+    return reads
 
-rule bwa_mem:
+
+rule coverm_tpm:
     input:
-        reads = get_reads,
-        idx = rules.bwa_index.output,
-        ffn = os.path.join(out_dir, "ORFs", "{sample}.ffn")
+        ffn = NR_FFN,
+        reads = get_all_reads()
     output:
-        sam = temp(os.path.join(out_dir, "BBMap", "mapping", "{sample}.sam")) if not noclean else os.path.join(out_dir, "BBMap", "mapping", "{sample}.sam")
+        raw = temp(os.path.join(out_dir, "Abundance", "coverm_tpm.raw.tsv"))
     threads: threads_cli
     log:
-        os.path.join(out_dir, "logs", "bwa_mem_{sample}.log")
+        os.path.join(out_dir, "logs", "coverm_tpm.log")
     params:
-        prefix = lambda wildcards, input: os.path.splitext(input.idx[0])[0]
-    run:
-        if READS_INTER:
-            shell(f"bwa mem -p -t {threads} {{params.prefix}} {{input.reads[0]}} > {{output.sam}} 2> {{log}}")
-        else:
-            shell(f"bwa mem -t {threads} {{params.prefix}} {{input.reads[0]}} {{input.reads[1]}} > {{output.sam}} 2> {{log}}")
-
-rule bbmap_pileup:
-    input:
-        sam = rules.bwa_mem.output.sam
-    output:
-        pileup = os.path.join(out_dir, "BBMap", "coverage", "{sample}.pileup")
-    log:
-        os.path.join(out_dir, "logs", "bbmap_pileup_{sample}.log")
-    shell:
-        "pileup.sh in={input.sam} out={output.pileup} -Xmx20g > {log} 2>&1"
-
-rule calculate_abundance:
-    input:
-        pileup = rules.bbmap_pileup.output.pileup
-    output:
-        abun = os.path.join(out_dir, "Abundance", "{sample}.abundance")
-    log:
-        os.path.join(out_dir, "logs", "calculate_abundance_{sample}.log")
+        reads = get_all_reads(),
+        bam_cache = os.path.join(out_dir, "BBMap", "mapping")
     run:
         import os
-        from scripts.func import gene_relative_abun
-        gene_relative_abun(input.pileup, wildcards.sample, os.path.dirname(output.abun))
+        import shlex
+
+        read_option = "--interleaved" if READS_INTER else "--coupled"
+        quoted_reads = " ".join(shlex.quote(str(path)) for path in params.reads)
+        cache_option = ""
+        if noclean:
+            os.makedirs(params.bam_cache, exist_ok=True)
+            cache_option = (
+                "--bam-file-cache-directory "
+                + shlex.quote(str(params.bam_cache))
+            )
+        command = (
+            f"coverm contig {read_option} {quoted_reads} "
+            f"--reference {shlex.quote(str(input.ffn))} --threads {threads} "
+            "--methods tpm --min-mapq 1 --output-format dense "
+            f"--output-file {shlex.quote(str(output.raw))} {cache_option} "
+            f"> {shlex.quote(str(log))} 2>&1"
+        )
+        shell(command)
+
+
+rule normalize_coverm_tpm:
+    input:
+        raw = rules.coverm_tpm.output.raw,
+        ffn = NR_FFN
+    output:
+        matrix = os.path.join(out_dir, "gene_abundance_among_samples.tab"),
+        abundances = expand(
+            os.path.join(out_dir, "Abundance", "{sample}.abundance"),
+            sample=BASENAMES
+        )
+    log:
+        os.path.join(out_dir, "logs", "normalize_coverm_tpm.log")
+    params:
+        script = os.path.join(workflow.basedir, "scripts", "normalize_coverm_tpm.py"),
+        samples = BASENAMES,
+        abundance_dir = os.path.join(out_dir, "Abundance")
+    shell:
+        """
+        python {params.script:q} --input {input.raw:q} --catalogue {input.ffn:q} --samples {params.samples:q} --output-matrix {output.matrix:q} --abundance-dir {params.abundance_dir:q} > {log:q} 2>&1
+        """

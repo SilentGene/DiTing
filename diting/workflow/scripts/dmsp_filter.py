@@ -23,7 +23,7 @@ def main():
     parser = argparse.ArgumentParser(description="Filter hmmsearch tblout results for DMSP")
     parser.add_argument("-i", "--input-dir", required=True, help="Directory containing .hmmout files")
     parser.add_argument("-o", "--output-file", required=True, help="Output filtered TSV")
-    parser.add_argument("-s", "--sample", required=True, help="Sample name")
+    parser.add_argument("-s", "--sample", default=None, help="Optional sample name")
     
     args = parser.parse_args()
     
@@ -68,7 +68,10 @@ def main():
     with open(args.output_file, "w", encoding="utf-8") as out:
         for gene_id in sorted(best_hits.keys()):
             dmsp_id = best_hits[gene_id][0]
-            out.write(f"{args.sample}\t{gene_id}\t{dmsp_id}\n")
+            if args.sample:
+                out.write(f"{args.sample}\t{gene_id}\t{dmsp_id}\n")
+            else:
+                out.write(f"{gene_id}\t{dmsp_id}\n")
 
 if __name__ == "__main__":
     main()

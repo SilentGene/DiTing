@@ -17,11 +17,14 @@ def main():
     parser.add_argument('-m', '--memory', metavar='memory', dest='m', type=int, default=50, help='Memory that will be used by metaSPAdes (in Gb). Default=50G')
     parser.add_argument('-vis', '--visualization', metavar='pathways_relative_abundance.tab', dest='vis', type=str, default=False, help='A table for visualization')
     parser.add_argument('--spades', dest='spades', action='store_true', default=False, help='metaSPAdes will be used for assembling instead of megahit if this flag is used')
-    parser.add_argument('--noclean', dest='nc', action='store_true', default=False, help='The sam files would be retained if this flag is used')
+    parser.add_argument('--min-seq-id', type=float, default=0.95, help='MMseqs2 nucleotide identity cutoff for the non-redundant gene catalogue (0 < value <= 1; default: 0.95)')
+    parser.add_argument('--noclean', dest='nc', action='store_true', default=False, help='The mapping BAM files produced by CoverM will be retained if this flag is used')
     parser.add_argument('--dry-run', action='store_true', help='Perform a dry run of the snakemake pipeline')
     parser.add_argument('--snakemake-args', nargs=argparse.REMAINDER, help='Additional arguments to pass to snakemake')
     
     args = parser.parse_args()
+    if not 0 < args.min_seq_id <= 1:
+        parser.error('--min-seq-id must be greater than 0 and no greater than 1')
 
     # Find the Snakefile
     snakefile = Path(__file__).resolve().parent / "workflow" / "Snakefile"
@@ -76,7 +79,8 @@ def main():
             f"spades={args.spades}",
             f"memory={args.m}",
             f"threads={args.n}",
-            f"noclean={args.nc}"
+            f"noclean={args.nc}",
+            f"min_seq_id={args.min_seq_id}"
         ])
         if args.a:
             config_args.append(f"assembly_dir={os.path.abspath(args.a)}")
