@@ -193,7 +193,7 @@ Example:
 ## Parameters
 ```powershell
 $ diting --help
-usage: diting [-h] [-v] -r input_reads -o output_dir -p profiles_dir -k ko_list [-a metagenomic_assembly] [-n threads] [-m memory]
+usage: diting [-h] [-v] [-r input_reads] [-o output_dir] [-p profiles_dir] [-k ko_list] [-a metagenomic_assembly] [-n threads] [-m memory]
               [-vis pathways_relative_abundance.tab] [--spades] [--min-seq-id MIN_SEQ_ID] [--noclean] [--dry-run] [--snakemake-args ...]
 
 DiTing: A Pipeline to Infer and Compare Biogeochemical Pathways
@@ -202,13 +202,13 @@ options:
   -h, --help            show this help message and exit
   -v, --version         show program version number and exit
   -r, --reads input_reads
-                        folder containing reads to be used as input
+                        folder containing reads to be used as input (required unless -vis is used)
   -o, --outdir output_dir
-                        output directory
+                        output directory (required unless -vis is used)
   -p, --profiles profiles_dir
-                        folder containing kofam profiles (*.hmm)
+                        folder containing kofam profiles (*.hmm) (required unless -vis is used)
   -k, --ko-list ko_list
-                        ko_list file
+                        ko_list file (required unless -vis is used)
   -a, --assembly metagenomic_assembly
                         folder containing metagenomic assemblies corresponding to provided reads, which should have the same basename as the reads
   -n, --threads threads
