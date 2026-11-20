@@ -8,9 +8,12 @@ class Pathway:
     Define pathways
     """
 
-    def __init__(self, abundance, bn):
+    def __init__(self, abundance, bn, amoa_ko='K10944'):
         self.abundance = abundance  # input relative abundance dictionary
         self.bn = bn  # input sample's basename
+        # KO used for ammonia monooxygenase subunit A: K10944 (pmoA-amoA) in
+        # older KOfam releases, K28504 (amoA) once KEGG split it from pmoA.
+        self.amoa_ko = amoa_ko
         self.out_data = {}  # output calculated dictionary
 
     def Photosystem_II(self):
@@ -1055,12 +1058,12 @@ class Pathway:
              self.abundance[self.bn+'_K22899'])/4)
 
     def Nitrification_ammonia_to_hydroxylamine(self):
-        ko_list = [self.bn+'_K10944', self.bn+'_K10945', self.bn+'_K10946']
+        ko_list = [self.bn+'_'+self.amoa_ko, self.bn+'_K10945', self.bn+'_K10946']
         for ko in ko_list:
             if ko not in self.abundance:
                 self.abundance[ko] = 0
         self.out_data['Nitrification, ammonia -> hydroxylamine (amoABC)'] = (
-          self.abundance[self.bn+'_K10944'] +
+          self.abundance[self.bn+'_'+self.amoa_ko] +
           self.abundance[self.bn+'_K10945'] +
           self.abundance[self.bn+'_K10946'])/3
 
@@ -1082,13 +1085,13 @@ class Pathway:
           self.abundance[self.bn+'_K00371'])/2
 
     def Nitrification(self):
-        ko_list = [self.bn+'_K10944', self.bn+'_K10945', self.bn+'_K10946',
+        ko_list = [self.bn+'_'+self.amoa_ko, self.bn+'_K10945', self.bn+'_K10946',
                    self.bn+'_K10535', self.bn+'_K00370', self.bn+'_K00371']
         for ko in ko_list:
             if ko not in self.abundance:
                 self.abundance[ko] = 0
         self.out_data['Nitrification'] = (
-          (self.abundance[self.bn+'_K10944'] +
+          (self.abundance[self.bn+'_'+self.amoa_ko] +
            self.abundance[self.bn+'_K10945'] +
            self.abundance[self.bn+'_K10946'])/3 +
           self.abundance[self.bn+'_K10535'] +

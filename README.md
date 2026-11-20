@@ -9,7 +9,8 @@
 > **🚀 Major Update (v2.0):** DiTing has been boosted to version 2! Compared to the initially published version, this release introduces several significant upgrades:
 > 1. **Rewrite using Snakemake**: The entire pipeline has been rewritten using `Snakemake`, providing robust workflow management, better parallelization, and the ability to **resume execution from breakpoints**.
 > 2. **Upgrade annotation engine (kofamscan)**: We have replaced the manual `hmmsearch` parsing system with the standardized `kofamscan` engine for KEGG annotations. This effectively resolves the frequent parsing errors and compatibility issues previously encountered with raw `hmmsearch` outputs.
-> 3. **Bioconda**: DiTing is now available on Bioconda, making it easier to install and manage dependencies.
+> 3. **Non-redundant gene catalogue**: Instead of annotating and quantifying each sample separately, DiTing now pools ORFs from all samples, removes genes shorter than 100 nt, and clusters them with `MMseqs2` (95% nucleotide identity by default, adjustable via `--min-seq-id`) to build a non-redundant gene catalogue. The catalogue is annotated only once, and gene abundance (TPM) is calculated by mapping the reads from every sample against it with `CoverM`. This keeps gene units consistent across samples, which makes their abundances directly comparable, and avoids running the same annotation over and over.
+> 4. **Bioconda**: DiTing is now available on Bioconda, making it easier to install and manage dependencies.
 
 ## Etymology
 **DiTing** is a Chinese mythical creature who knows everything when he puts his ears to the earth's surface. Similarly, this program is developed to accurately and efficiently recognize biogeochemical cycles from environmental omic data.    
@@ -23,7 +24,7 @@ To cite DiTing please use
 DiTing is designed to determine the relative abundance of metabolic and biogeochemical functional pathways in a set of given metagenomic or metatranscriptomic data. The input should be a folder containing a group of paired-end clean reads. These reads will be assembled, annotated, and parsed to produce a table detailing the relative abundance of elemental and biogeochemical cycling pathways (e.g., Nitrogen, Carbon, Sulfur, and DMSP) in each sample. Sketch maps and heatmaps will also be produced to visually compare these biogeochemical functions.
 
 ## Procedure
-![image](./Flow_chart.png)
+![image](./Flow_chart.jpg)
 
 ## Dependencies
 DiTing now relies on **Snakemake >= 9.0** to manage the pipeline. The underlying bioinformatics dependencies remain:
@@ -36,9 +37,9 @@ DiTing now relies on **Snakemake >= 9.0** to manage the pipeline. The underlying
 * [CoverM](https://github.com/wwood/CoverM)
 * [HMMER3](http://hmmer.org/)
 * [KofamScan](https://github.com/takaram/kofam_scan)
+* [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala/)
 * Python modules (handled by conda/pip): 
     * `pandas`, `matplotlib`, `opencv-python`, `Pillow`, `seaborn`
-* [KofamKOALA hmm database](https://www.genome.jp/tools/kofamkoala/)
 
 ## Installation
 Recommended configuration:  
@@ -82,6 +83,8 @@ wget -c ftp://ftp.genome.jp/pub/db/kofam/profiles.tar.gz
 gzip -d ko_list.gz
 tar zxvf profiles.tar.gz 
 ```
+
+> **Note on amoA/pmoA:** Newer KOfam releases split ammonia monooxygenase subunit A (`amoA`, K28504) from particulate methane monooxygenase subunit A (`pmoA`, K10944). DiTing checks whether your `ko_list` contains K28504 and picks the matching formula automatically, so both older and newer databases work. With a newer database, ammonia oxidation is calculated from K28504+K10945+K10946 (KEGG module M00528). With an older one, it falls back to K10944+K10945+K10946. Methane oxidation always uses K10944+K10945+K10946 (KEGG module M00174). The amoA KO that was used is recorded in `logs/process_tables.log`.
 
 ## Running
 ### 1. One step running

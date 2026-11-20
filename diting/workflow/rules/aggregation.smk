@@ -55,16 +55,26 @@ rule process_tables:
         pathways_table = os.path.join(out_dir, "pathways_relative_abundance.tab")
     log:
         os.path.join(out_dir, "logs", "process_tables.log")
+    params:
+        ko_list = KO_LIST
     run:
         import os
 
         from scripts.func import (
             build_gene_family,
+            detect_amoa_ko,
             hierarchical_ko_abundance_among_samples,
             pathway_parser,
             table_of_ko_abundance_among_samples,
         )
         from scripts.transposition import transposition
+
+        amoa_ko = detect_amoa_ko(params.ko_list)
+        with open(log[0], "w", encoding="utf-8") as log_handle:
+            log_handle.write(
+                f"amoA KO used for ammonia oxidation: {amoa_ko} "
+                f"(detected from {params.ko_list})\n"
+            )
 
         intermediate_ko_table = os.path.join(
             out_dir, "KEGG_annotation", "ko_abundance_among_samples.tab"
@@ -82,11 +92,11 @@ rule process_tables:
             TABLE_DIR, "KO_affilated_to_biogeochemical_cycle.tab"
         )
         hierarchical_ko_abundance_among_samples(
-            intermediate_ko_table, cycle_table, hierarchy_table
+            intermediate_ko_table, cycle_table, hierarchy_table, amoa_ko
         )
 
         pathway_tmp = os.path.join(out_dir, "pathways_relative_abundance_tmp.tab")
-        pathway_parser(input.ko_abun, pathway_tmp)
+        pathway_parser(input.ko_abun, pathway_tmp, amoa_ko)
         transposition(pathway_tmp)
         os.replace(pathway_tmp + ".transposition", output.pathways_table)
         os.replace(intermediate_ko_table, output.ko_abundance_among_samples)

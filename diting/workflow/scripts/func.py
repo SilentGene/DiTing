@@ -275,7 +275,26 @@ def table_of_ko_abundance_among_samples(ko_abun_txt, output):
 
     logging.info('A table of ko abundance among samples was produced to {}'.format(output))
 
-def hierarchical_ko_abundance_among_samples(table_of_ko_abundance_among_samples, KO_affilated_to_biogeochemical_cycle_tab, output):
+LEGACY_AMOA_KO = 'K10944'  # pmoA-amoA in KOfam releases before the split
+SPLIT_AMOA_KO = 'K28504'   # amoA after KEGG split it from pmoA (K10944)
+AMMONIA_OXIDATION_PATHWAY = 'Nitrification, ammonia -> hydroxylamine'
+
+
+def detect_amoa_ko(ko_list):
+    """Return the KO representing amoA in the user's KOfam release.
+
+    KOfam ships no version field, so detect the split directly: newer
+    releases define K28504 (amoA) and keep K10944 for pmoA only.
+    """
+    opener = gzip.open if str(ko_list).endswith('.gz') else open
+    with opener(ko_list, 'rt', encoding='utf-8') as fi:
+        for line in fi:
+            if line.split('\t', 1)[0] == SPLIT_AMOA_KO:
+                return SPLIT_AMOA_KO
+    return LEGACY_AMOA_KO
+
+
+def hierarchical_ko_abundance_among_samples(table_of_ko_abundance_among_samples, KO_affilated_to_biogeochemical_cycle_tab, output, amoa_ko=LEGACY_AMOA_KO):
     Knumber_to_abundance = {}
     with open(table_of_ko_abundance_among_samples) as fi:
         for line in fi:
@@ -287,9 +306,20 @@ def hierarchical_ko_abundance_among_samples(table_of_ko_abundance_among_samples,
             Knumber_to_abundance[k_number] = value
     with open(output, 'w') as fo:
         fo.write('')
+    amoa_ko_line = SPLIT_AMOA_KO + '\tamoA; ammonia monooxygenase subunit A [EC:1.14.99.39]'
+    current_pathway = ''
     with open(KO_affilated_to_biogeochemical_cycle_tab) as fi:
         for line in fi:
             line = line.rstrip()
+            fields = line.split('\t')
+            if fields[1]:
+                current_pathway = fields[1].strip('"')
+            # With a post-split KOfam release, amoA is K28504 rather than
+            # K10944 (now pmoA only) in the ammonia-oxidation step.
+            if (amoa_ko == SPLIT_AMOA_KO
+                    and current_pathway.startswith(AMMONIA_OXIDATION_PATHWAY)
+                    and fields[2] == LEGACY_AMOA_KO):
+                line = '\t'.join(fields[:2]) + '\t' + amoa_ko_line
             k_number = line.split('\t')[2]
             if k_number not in Knumber_to_abundance.keys():
                 with open(output, 'a') as fo:
@@ -313,7 +343,7 @@ def kegg_decoder(input_tab, output):
     os.system(cmd)
 
 
-def pathway_parser(in_tab, output):
+def pathway_parser(in_tab, output, amoa_ko=LEGACY_AMOA_KO):
     relative_abundance = {}
     genome_data = []
     for line in open(in_tab, "r"):
@@ -342,7 +372,7 @@ def pathway_parser(in_tab, output):
     for k in genome_data:
         # print(k)
         # print(reverse_tca(relative_abundance, k))
-        pathway_abundant = Pathway(relative_abundance, k)
+        pathway_abundant = Pathway(relative_abundance, k, amoa_ko)
         pathway_data = pathway_abundant.solve_pathway()
 
         # print k, pathway_data
